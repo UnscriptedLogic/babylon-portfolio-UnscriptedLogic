@@ -56,6 +56,16 @@ var playgroundScene = function (engine: Engine, canvas: HTMLCanvasElement, hk: H
       clickForce,
       collisionImpulseThreshold,
       ballDiameter: 1.5,
+      collisionScaleReaction: {
+        enabled: true,
+        // Tune these to taste
+        maxScaleAdd: 0.28, // peak scale = 1 + this
+        durationSeconds: 0.16,
+        impactPortion: 0.25,
+        cooldownSeconds: 0.07,
+      },
+      // The original axis-based squash/stretch is still available too:
+      // collisionSquashStretch: { enabled: true, maxStretch: 0.35, maxSquash: 0.22 },
     });
 
     // Physics aggregates
