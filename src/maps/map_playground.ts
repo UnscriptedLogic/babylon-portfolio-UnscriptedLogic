@@ -1,5 +1,6 @@
 import {
   MeshBuilder,
+  AbstractMesh,
   PhysicsAggregate,
   PhysicsShapeType,
   Scene,
@@ -14,6 +15,7 @@ export type PlaygroundMapOptions = {
 };
 
 export function buildPlaygroundMap(scene: Scene, options: PlaygroundMapOptions) {
+  const meshes: AbstractMesh[] = [];
   const wallHeight = options.wallHeight ?? 4;
   const wallThickness = options.wallThickness ?? 1;
   const halfSize = options.halfSize;
@@ -33,6 +35,7 @@ export function buildPlaygroundMap(scene: Scene, options: PlaygroundMapOptions) 
       { mass: 0, restitution: 0.1, friction: 0.9 },
       scene
     );
+    meshes.push(box);
     return box;
   };
 
@@ -50,6 +53,7 @@ export function buildPlaygroundMap(scene: Scene, options: PlaygroundMapOptions) 
       { mass, restitution: 0.2, friction: 0.8 },
       scene
     );
+    meshes.push(cube);
     return cube;
   };
 
@@ -94,5 +98,7 @@ export function buildPlaygroundMap(scene: Scene, options: PlaygroundMapOptions) 
   createDynamicCube("cube_2", 2, new Vector3(4, 1, 14), 3);
   createDynamicCube("cube_3", 1.5, new Vector3(-6, 1, 10), 2);
   createDynamicCube("cube_4", 1.5, new Vector3(-8, 1, -2), 2);
+
+  return meshes;
 }
 

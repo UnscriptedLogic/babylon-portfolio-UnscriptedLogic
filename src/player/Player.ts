@@ -21,6 +21,9 @@ import {
   attachCollisionScaleReaction,
   CollisionScaleReactionOptions,
 } from "../utility/CollisionScaleReaction";
+import { attachSpeedTrail, SpeedTrailOptions } from "../utility/SpeedTrail";
+import { Color3 } from "@babylonjs/core";
+import { createToonMaterial, ToonMaterialOptions } from "../utility/Toon";
 
 export type PlayerOptions = {
   spawnPoint: Vector3;
@@ -49,6 +52,25 @@ export type PlayerOptions = {
     /** Set false to disable */
     enabled?: boolean;
   };
+
+  /** Stylized trail that turns on above a speed threshold */
+  speedTrail?: Partial<SpeedTrailOptions> & {
+    /** Set false to disable */
+    enabled?: boolean;
+  };
+
+  /** Toon/cel shading for the player ball */
+  toon?: Partial<ToonMaterialOptions> & {
+    enabled?: boolean;
+  };
+
+  /** Built-in Babylon outline to help the ball pop */
+  outline?: {
+    enabled?: boolean;
+    color?: Color3;
+    /** Typical range ~0.01–0.08 depending on scene scale */
+    width?: number;
+  };
 };
 
 export class Player {
@@ -62,6 +84,7 @@ export class Player {
   private _cameraOffset?: Vector3;
   private _disposeSquashStretch?: () => void;
   private _disposeScaleReaction?: () => void;
+  private _disposeSpeedTrail?: () => void;
 
   constructor(scene: Scene, ground: AbstractMesh, options: PlayerOptions) {
     this._scene = scene;
@@ -74,6 +97,8 @@ export class Player {
       scene
     );
     this.ball.position.copyFrom(options.spawnPoint);
+    this._wireToonMaterial();
+    this._wireOutline();
 
     this.aggregate = new PhysicsAggregate(
       this.ball,
@@ -86,7 +111,39 @@ export class Player {
     // NOTE: swapped to scale reaction for testing as requested.
     // You can switch back by calling `_wireCollisionSquashStretchUtility()` instead.
     this._wireCollisionScaleReactionUtility();
+    this._wireSpeedTrailUtility();
     this._wireClickToMove();
+  }
+
+  private _wireToonMaterial() {
+    const cfg = this._options.toon;
+    if (cfg?.enabled === false) {
+      return;
+    }
+
+    const mat = createToonMaterial(this._scene, "playerToon", {
+      lightName: cfg?.lightName ?? "key",
+      baseColor: cfg?.baseColor ?? new Color3(0.95, 0.82, 0.72),
+      shadeColor: cfg?.shadeColor ?? new Color3(0.20, 0.12, 0.26),
+      steps: cfg?.steps ?? 3,
+      hardness: cfg?.hardness ?? 1.45,
+      rimStrength: cfg?.rimStrength ?? 0.16,
+      rimPower: cfg?.rimPower ?? 2.2,
+      rimColor: cfg?.rimColor ?? new Color3(0.85, 0.6, 1.0),
+    });
+
+    this.ball.material = mat;
+  }
+
+  private _wireOutline() {
+    const cfg = this._options.outline;
+    if (cfg?.enabled === false) {
+      return;
+    }
+
+    this.ball.renderOutline = true;
+    this.ball.outlineColor = cfg?.color ?? new Color3(0.10, 0.06, 0.16);
+    this.ball.outlineWidth = cfg?.width ?? 0.04;
   }
 
   /**
@@ -233,6 +290,44 @@ export class Player {
         enabled: cfg?.enabled,
       }
     );
+  }
+
+  private _wireSpeedTrailUtility() {
+    const cfg = this._options.speedTrail;
+    if (cfg?.enabled === false) {
+      return;
+    }
+
+    const speedOn = cfg?.speedOn ?? 10;
+    const speedOff = cfg?.speedOff ?? speedOn * 0.8;
+    const speedForMax = cfg?.speedForMax ?? Math.max(speedOn, 1) * 1.6;
+
+    const handle = attachSpeedTrail(
+      this._scene,
+      this.ball,
+      () => this.aggregate.body.getLinearVelocity(),
+      {
+        enabled: cfg?.enabled,
+        speedOn,
+        speedOff,
+        speedForMax,
+        emitRateMin: cfg?.emitRateMin,
+        emitRateMax: cfg?.emitRateMax,
+        sizeMin: .05,
+        sizeMax: .4,
+        lifeMin: .1,
+        lifeMax: 0.25,
+        spread: cfg?.spread,
+        backwardPowerMax: cfg?.backwardPowerMax,
+        textureUrl: cfg?.textureUrl,
+        color1: cfg?.color1,
+        color2: cfg?.color2,
+        colorDead: cfg?.colorDead,
+        ribbonWidth: .75,
+      }
+    );
+
+    this._disposeSpeedTrail = handle.dispose;
   }
 
   private _wireClickToMove() {
