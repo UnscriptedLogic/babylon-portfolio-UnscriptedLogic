@@ -8,6 +8,8 @@
     "sourceMap": true,
     "preserveConstEnums": true,
     "lib": ["dom", "es6"],
-    "rootDir": "src"
+    "rootDir": "src",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   }
 }

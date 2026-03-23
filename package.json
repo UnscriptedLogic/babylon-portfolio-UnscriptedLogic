@@ -21,6 +21,10 @@
     "webpack-dev-server": "^5.2.3"
   },
   "dependencies": {
-    "@babylonjs/havok": "^1.3.12"
+    "@babylonjs/gui": "^8.56.1",
+    "@babylonjs/havok": "^1.3.12",
+    "@babylonjs/loaders": "^8.56.1",
+    "earcut": "^3.0.2",
+    "fontfaceobserver": "^2.3.0"
   }
 }
