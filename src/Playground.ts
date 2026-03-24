@@ -9,8 +9,10 @@ import {
     FreeCamera,
     HavokPlugin,
     HemisphericLight,
+    ImportMeshAsync,
     ISceneLoaderAsyncResult,
     LensRenderingPipeline,
+    Mesh,
     MeshBuilder,
     PhysicsAggregate,
     PhysicsShapeType,
@@ -18,7 +20,9 @@ import {
     ShadowGenerator,
     SSAO2RenderingPipeline,
     SSAORenderingPipeline,
+    StandardMaterial,
     Texture,
+    UniversalCamera,
     Vector3,
 } from "@babylonjs/core";
 import { buildPlaygroundMap } from "./maps/map_playground";
@@ -27,11 +31,16 @@ import { createCameraShake } from "./utility/CameraShake";
 import { NPC } from "./prefabs/NPC";
 import { addTag } from "./utility/EntityTag";
 import { EntityTags } from "./utility/EntityTags";
+import * as GUI from "@babylonjs/gui";
 import {
     attachTriggerSphere,
     createDisplayTag,
     ImportCustomModel,
+    transitionToCamera,
+    Vector3DegreesToRadians,
 } from "./utility/UtilityFunctions";
+
+import { createBentoLayout } from "./utility/BentoBoxLayout";
 
 var playgroundScene = function (
     engine: Engine,
@@ -43,7 +52,7 @@ var playgroundScene = function (
     const distanceXZ = 24;
     const heightY = Math.SQRT2 * distanceXZ; // ensures 45° down tilt toward target
 
-    const camera = new FreeCamera(
+    const camera = new UniversalCamera(
         "orthoIsoCamera",
         new Vector3(distanceXZ, heightY, distanceXZ),
         scene,
@@ -206,7 +215,7 @@ var playgroundScene = function (
         shadows,
     );
 
-    // testNPC.enablePhsyics(0);
+    //NPCs
     ImportCustomModel("StupidFuckingFish", scene).then(
         (result: ISceneLoaderAsyncResult) => {
             const npc_fishGame = new NPC(
@@ -229,48 +238,230 @@ var playgroundScene = function (
             texture.updateSamplingMode(Texture.NEAREST_SAMPLINGMODE);
             npc_fishGame.setTexture(texture);
 
-            createDisplayTag(
+            var displayTag = createDisplayTag(
                 npc_fishGame.data.npcName,
                 npc_fishGame.meshes[0],
                 scene,
                 { offset: new Vector3(0, -6, 0) },
             );
 
+            //setup individual NPC camera
+            var fishCamera = new UniversalCamera(
+                "npcCamera",
+                new Vector3(32, 3, -30),
+                scene,
+            );
+            fishCamera.setTarget(
+                npc_fishGame.meshes[0].position.add(new Vector3(0, 6, -10)),
+            );
+
             var timer: ReturnType<typeof setTimeout>;
+            var escapeListener: (ev: KeyboardEvent) => void;
+            var inspected = false;
+            var plane: Mesh;
+            var infoPlane: Mesh;
             attachTriggerSphere(
                 npc_fishGame.meshes[0],
                 [player.getmesh()],
                 scene,
                 {
-                    radius: 6,
+                    radius: 5,
                     onEnter: () => {
-                        console.log("Entered!");
-
                         timer = setTimeout(() => {
-                            alert(
-                                "Congratulations! You found the secret fish game easter egg! 🐟🎮",
-                            );
+                            inspected = true;
 
-                            //stop the player from all movement for quality of life
-                            player.aggregate.body.setLinearVelocity(
-                                new Vector3(0, 0, 0),
+                            transitionToCamera(
+                                fishCamera,
+                                npc_fishGame.meshes[0].position.add(
+                                    new Vector3(0, 6, -8),
+                                ),
+                                1,
                             );
-                            player.aggregate.body.setAngularVelocity(
-                                new Vector3(0, 0, 0),
-                            );
+                            displayTag.isVisible = false;
+
+                            player.freeze();
+
+                            ImportMeshAsync(
+                                `/models/CurvedPlane.glb`,
+                                scene,
+                            ).then((res) => {
+                                const root = res.meshes[0];
+                                plane = res.meshes[1] as Mesh;
+                                root.position =
+                                    npc_fishGame.meshes[0].position.add(
+                                        new Vector3(6, 6.5, -7),
+                                    );
+                                root.scaling = new Vector3(2.5, 1.5, 1.5);
+
+                                root.rotation = Vector3DegreesToRadians(
+                                    new Vector3(-5, 200, 0),
+                                );
+
+                                var advancedTexture =
+                                    GUI.AdvancedDynamicTexture.CreateForMesh(
+                                        plane,
+                                        1024,
+                                        1024,
+                                    );
+
+                                createBentoLayout(
+                                    plane,
+                                    [
+                                        {
+                                            src: "/images/FishGame/Image1.png",
+                                            colSpan: 2,
+                                            rowSpan: 2,
+                                        },
+                                        {
+                                            src: "/images/FishGame/Image2.png",
+                                            colSpan: 2,
+                                            rowSpan: 2,
+                                        },
+                                        {
+                                            src: "/images/FishGame/DFG_Vid1.mp4",
+                                            colSpan: 4,
+                                            rowSpan: 4,
+                                        },
+                                        {
+                                            src: "/images/FishGame/Image3.png",
+                                            colSpan: 3,
+                                            rowSpan: 3,
+                                        },
+                                        {
+                                            src: "/images/FishGame/Image4.png",
+                                            colSpan: 1,
+                                            rowSpan: 1,
+                                        },
+                                        {
+                                            src: "/images/FishGame/DFG_Vid2.mp4",
+                                            colSpan: 3,
+                                            rowSpan: 3,
+                                        },
+                                        {
+                                            src: "/images/FishGame/Image5.png",
+                                            colSpan: 2,
+                                            rowSpan: 2,
+                                        },
+                                        {
+                                            src: "/images/FishGame/Image6.png",
+                                            colSpan: 1,
+                                            rowSpan: 1,
+                                        },
+                                    ],
+                                    {
+                                        columns: 8,
+                                        rows: 8,
+                                        gap: 8,
+                                        padding: 6,
+                                        cornerRadius: 0,
+                                        textureWidth: 1024,
+                                        textureHeight: 1024,
+
+                                        cellBorder: {
+                                            color: "#ffddaa",
+                                            thickness: 0,
+                                            alpha: 0.25,
+                                        },
+                                        entrance: {
+                                            durationMs: 380 * 2,
+                                            staggerMs: 65 * 2,
+                                            slidePixels: 44,
+                                        },
+                                        float: {
+                                            amplitudePx: 4,
+                                            periodMs: 3000,
+                                            phaseOffsetMs: 350,
+                                        },
+                                    },
+                                );
+
+                                // const adtMat = new StandardMaterial(
+                                //     "adtMat",
+                                //     scene,
+                                // );
+                                // adtMat.diffuseTexture = advancedTexture;
+                                // adtMat.emissiveColor = Color3.White();
+                                // adtMat.disableLighting = true;
+                                // plane.material = adtMat;
+                            });
+
+                            ImportMeshAsync(
+                                "/models/CurvedPlane.glb",
+                                scene,
+                            ).then((res) => {
+                                const root = res.meshes[0];
+                                infoPlane = res.meshes[1] as Mesh;
+                                root.position =
+                                    npc_fishGame.meshes[0].position.add(
+                                        new Vector3(6.5, 1.75, -6.5),
+                                    );
+                                root.scaling = new Vector3(1, 1.1, 1).scale(2);
+
+                                root.rotation = Vector3DegreesToRadians(
+                                    new Vector3(0, 200, 0.5),
+                                );
+
+                                var advancedTexture =
+                                    GUI.AdvancedDynamicTexture.CreateForMesh(
+                                        infoPlane,
+                                    );
+
+                                const textBlock = new GUI.TextBlock();
+                                textBlock.text =
+                                    "This project serves as a personal reminder that the experience conveyed is often more valuable than the game itself. Made solely for the memes, this is my joke game that became my best performing game jam submission. Scoring 84th in a 500 submission game jam, this is my 'this did well somehow' project I will never forget.";
+                                textBlock.fontFamily = "Mustica";
+                                textBlock.fontSize = 32;
+                                textBlock.color = "#ffffff";
+                                textBlock.outlineWidth = 4;
+                                textBlock.outlineColor = "#000000";
+                                textBlock.textWrapping =
+                                    GUI.TextWrapping.WordWrap;
+                                textBlock.width = "100%";
+                                textBlock.height = "100%";
+                                textBlock.paddingRight = "12px";
+                                textBlock.verticalAlignment =
+                                    GUI.Control.VERTICAL_ALIGNMENT_TOP;
+
+                                advancedTexture.addControl(textBlock);
+                            });
+
+                            //if the player presses escape while in the trigger, transition back to the main camera immediately
+                            escapeListener = (ev: KeyboardEvent) => {
+                                if (ev.key === "Escape") {
+                                    transitionToCamera(camera, cameraOffset, 1);
+                                    plane.dispose();
+                                    infoPlane.dispose();
+
+                                    displayTag.isVisible = true;
+                                    inspected = false;
+                                    window.removeEventListener(
+                                        "keydown",
+                                        escapeListener,
+                                    );
+                                    clearTimeout(timer);
+                                }
+                            };
+                            window.addEventListener("keydown", escapeListener);
                         }, 1000);
                     },
                     onExit: () => {
-                        console.log("Exit!");
-
                         clearTimeout(timer);
+
+                        if (inspected) {
+                            plane.dispose();
+                            infoPlane.dispose();
+                            displayTag.isVisible = true;
+                            transitionToCamera(camera, cameraOffset, 1);
+                            window.removeEventListener(
+                                "keydown",
+                                escapeListener,
+                            );
+                        }
                     },
                 },
             );
         },
     );
-
-    // ImportCustomModel()
 
     scene.onBeforeRenderObservable.add(() => {
         player.update();

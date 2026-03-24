@@ -1,14 +1,23 @@
 import {
     AbstractMesh,
     ActionManager,
+    Animation,
+    Camera,
+    CircleEase,
     Color3,
+    EasingFunction,
     ExecuteCodeAction,
+    ExponentialEase,
     ImportMeshAsync,
     MeshBuilder,
+    PowerEase,
+    QuinticEase,
     Scene,
+    UniversalCamera,
     Vector3,
 } from "@babylonjs/core";
 import * as GUI from "@babylonjs/gui";
+import { Interpolation, Tween } from "@tweenjs/tween.js";
 
 export const ImportCustomModel = async (fileName: string, scene: Scene) => {
     const result = ImportMeshAsync(`/models/Mesh_${fileName}.glb`, scene);
@@ -65,6 +74,8 @@ export const createDisplayTag = (
     plane.setParent(anchor, false);
     plane.position = Vector3.Zero().add(config.offset);
     plane.rotation = Vector3DegreesToRadians(Vector3.Zero());
+
+    return plane;
 };
 
 export type TriggerSphereConfig = {
@@ -117,4 +128,57 @@ export const attachTriggerSphere = (
             ),
         );
     }
+};
+
+export const transitionToCamera = (
+    newCam: UniversalCamera,
+    target: Vector3 = Vector3.Zero(),
+    durationSec: number,
+) => {
+    const scene = newCam.getScene();
+    const activeCam = scene.activeCamera as UniversalCamera;
+
+    scene.activeCamera = newCam;
+    const originalLocation = newCam.position.clone();
+    const originalRotation = newCam.rotation.clone();
+
+    const ease = new CircleEase();
+    ease.setEasingMode(CircleEase.EASINGMODE_EASEINOUT);
+
+    const posAnim = new Animation(
+        "cameraTransition",
+        "position",
+        60,
+        Animation.ANIMATIONTYPE_VECTOR3,
+        Animation.ANIMATIONLOOPMODE_CONSTANT,
+    );
+
+    posAnim.setKeys([
+        { frame: 0, value: activeCam.position.clone() },
+        { frame: durationSec * 60, value: originalLocation },
+    ]);
+    posAnim.setEasingFunction(ease);
+
+    const rotAnim = new Animation(
+        "camRot",
+        "rotation",
+        60,
+        Animation.ANIMATIONTYPE_VECTOR3,
+        Animation.ANIMATIONLOOPMODE_CONSTANT,
+    );
+
+    rotAnim.setKeys([
+        { frame: 0, value: activeCam.rotation.clone() },
+        { frame: durationSec * 60, value: originalRotation },
+    ]);
+    rotAnim.setEasingFunction(ease);
+    scene.beginDirectAnimation(
+        newCam,
+        [posAnim, rotAnim], // pass both animations together
+        0,
+        durationSec * 60,
+        false,
+        1,
+        () => {},
+    );
 };

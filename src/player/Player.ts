@@ -119,7 +119,7 @@ export class Player {
             scene,
         );
 
-        this.aggregate.body.setAngularDamping(2);
+        this.aggregate.body.setAngularDamping(1.5);
 
         this._wireCollisionParticles();
         // NOTE: swapped to scale reaction for testing as requested.
@@ -131,6 +131,11 @@ export class Player {
 
     getmesh(): AbstractMesh {
         return this.ball;
+    }
+
+    freeze() {
+        this.aggregate.body.setLinearVelocity(new Vector3(0, 0, 0));
+        this.aggregate.body.setAngularVelocity(new Vector3(0, 0, 0));
     }
     private _wireToonMaterial() {
         const cfg = this._options.toon;
