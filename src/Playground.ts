@@ -82,7 +82,7 @@ var playgroundScene = function (
     const fill = new HemisphericLight("fill", new Vector3(0, 1, 0), scene);
     fill.intensity = 0.5;
     fill.diffuse = new Color3(0.8, 0.76, 0.95);
-    fill.groundColor = new Color3(0.72, 0.62, 0.78);
+    fill.groundColor = new Color3(0.9, 0.7, 0.5);
     fill.specular = new Color3(0.06, 0.06, 0.07);
 
     const key = new DirectionalLight(
@@ -121,7 +121,7 @@ var playgroundScene = function (
         { width: 1000, height: 1000 },
         scene,
     );
-    ground.isVisible = false; // hide the ground mesh; we can still see its shadow and it will interact with physics
+    ground.isVisible = false;
 
     const player = new Player(scene, ground, {
         spawnPoint,
@@ -374,15 +374,6 @@ var playgroundScene = function (
                                         },
                                     },
                                 );
-
-                                // const adtMat = new StandardMaterial(
-                                //     "adtMat",
-                                //     scene,
-                                // );
-                                // adtMat.diffuseTexture = advancedTexture;
-                                // adtMat.emissiveColor = Color3.White();
-                                // adtMat.disableLighting = true;
-                                // plane.material = adtMat;
                             });
 
                             ImportMeshAsync(
@@ -406,11 +397,21 @@ var playgroundScene = function (
                                         infoPlane,
                                     );
 
+                                //background colour
+                                const rect = new GUI.Rectangle();
+                                rect.width = "100%";
+                                rect.height = "25%";
+                                rect.background = "#171717";
+                                rect.alpha = 0.5;
+                                rect.cornerRadius = 6;
+
+                                advancedTexture.addControl(rect);
+
                                 const textBlock = new GUI.TextBlock();
                                 textBlock.text =
                                     "This project serves as a personal reminder that the experience conveyed is often more valuable than the game itself. Made solely for the memes, this is my joke game that became my best performing game jam submission. Scoring 84th in a 500 submission game jam, this is my 'this did well somehow' project I will never forget.";
                                 textBlock.fontFamily = "Mustica";
-                                textBlock.fontSize = 32;
+                                textBlock.fontSize = 30;
                                 textBlock.color = "#ffffff";
                                 textBlock.outlineWidth = 4;
                                 textBlock.outlineColor = "#000000";
@@ -418,9 +419,120 @@ var playgroundScene = function (
                                     GUI.TextWrapping.WordWrap;
                                 textBlock.width = "100%";
                                 textBlock.height = "100%";
-                                textBlock.paddingRight = "12px";
+                                var padding = 24;
+                                textBlock.paddingTop = padding + "px";
+                                textBlock.paddingRight = padding + "px";
+                                textBlock.paddingBottom = padding + "px";
+                                textBlock.paddingLeft = padding + "px";
                                 textBlock.verticalAlignment =
                                     GUI.Control.VERTICAL_ALIGNMENT_TOP;
+
+                                advancedTexture.addControl(textBlock);
+                            });
+                            ImportMeshAsync(
+                                "/models/CurvedPlane.glb",
+                                scene,
+                            ).then((res) => {
+                                const root = res.meshes[0];
+                                const creditsPlane = res.meshes[1] as Mesh;
+                                root.position =
+                                    npc_fishGame.meshes[0].position.add(
+                                        new Vector3(-2, 8, 0),
+                                    );
+                                root.rotation = Vector3DegreesToRadians(
+                                    new Vector3(0, 240, -2),
+                                );
+                                root.scaling = new Vector3(1, 1, 1).scale(1);
+
+                                var advancedTexture =
+                                    GUI.AdvancedDynamicTexture.CreateForMesh(
+                                        creditsPlane,
+                                    );
+
+                                //background colour
+                                const rect = new GUI.Rectangle();
+                                rect.width = "100%";
+                                rect.height = "100%";
+                                rect.background = "#171717";
+                                rect.alpha = 0.9;
+
+                                //border radius
+                                rect.cornerRadius = 12;
+
+                                advancedTexture.addControl(rect);
+
+                                //game thumbnail
+                                const thumb = new GUI.Image();
+                                thumb.source = "/images/FishGame/Thumbnail.png";
+
+                                thumb.width = "100%";
+                                thumb.height = "75%";
+                                thumb.stretch = GUI.Image.STRETCH_UNIFORM;
+
+                                thumb.verticalAlignment =
+                                    GUI.Control.VERTICAL_ALIGNMENT_TOP;
+                                thumb.horizontalAlignment =
+                                    GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+                                advancedTexture.addControl(thumb);
+
+                                thumb.onPointerClickObservable.add(() => {
+                                    window.open(
+                                        "https://unscriptedlogic.itch.io/dumbass-fish-game",
+                                        "_blank",
+                                    );
+                                });
+
+                                //change cursor to show clickable
+                                thumb.onPointerEnterObservable.add(() => {
+                                    document.body.style.cursor = "pointer";
+                                });
+                                thumb.onPointerOutObservable.add(() => {
+                                    document.body.style.cursor = "default";
+                                });
+
+                                //padding
+                                const padding = 48;
+                                thumb.paddingTop = `${padding + 78}px`;
+                                thumb.paddingBottom = `${padding}px`;
+                                thumb.paddingLeft = `${padding}px`;
+                                thumb.paddingRight = `${padding}px`;
+
+                                //Play The Game Text Header
+                                const header = new GUI.TextBlock();
+                                header.text = "Play The Game";
+                                header.width = "80%";
+                                header.height = "10%";
+                                header.fontFamily = "Geizer";
+                                header.fontSize = 80;
+                                header.color = "#ffffff";
+                                header.outlineWidth = 4;
+                                header.outlineColor = "#000000";
+                                header.paddingTop = `${padding}px`;
+                                header.verticalAlignment =
+                                    GUI.Control.VERTICAL_ALIGNMENT_TOP;
+                                header.horizontalAlignment =
+                                    GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+
+                                advancedTexture.addControl(header);
+
+                                const textBlock = new GUI.TextBlock();
+                                textBlock.text =
+                                    "You're a fish that sells fish to fish people. Made with Blender, BlockBench and Unity for the Fishy Game Jam 2024";
+                                textBlock.fontFamily = "Mustica";
+                                textBlock.fontSize = 42;
+                                textBlock.color = "#ffffff";
+                                textBlock.outlineWidth = 4;
+                                textBlock.outlineColor = "#000000";
+                                textBlock.textWrapping =
+                                    GUI.TextWrapping.WordWrap;
+                                textBlock.width = "100%";
+                                textBlock.height = "30%";
+                                textBlock.paddingTop = `${padding}px`;
+                                textBlock.paddingBottom = `${padding}px`;
+                                textBlock.paddingLeft = `${padding}px`;
+                                textBlock.paddingRight = `${padding}px`;
+                                textBlock.verticalAlignment =
+                                    GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 
                                 advancedTexture.addControl(textBlock);
                             });

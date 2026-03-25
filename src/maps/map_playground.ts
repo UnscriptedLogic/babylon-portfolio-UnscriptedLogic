@@ -53,6 +53,18 @@ export function buildPlaygroundMap(
 
                     m.receiveShadows = true;
 
+                    const material = new StandardMaterial(
+                        `mat_${m.name}`,
+                        scene,
+                    );
+                    material.diffuseColor = Color3.FromHexString("#58a86a");
+                    // material.emissiveColor =
+                    //     Color3.FromHexString("#ffffff").scale(0.1);
+
+                    m.material = material;
+
+                    material.backFaceCulling = false;
+
                     if (!m.name.toLowerCase().includes("nocoll")) {
                         new PhysicsAggregate(
                             m,
@@ -155,7 +167,9 @@ export function buildPlaygroundMap(
             model.rotation = Vector3DegreesToRadians(rotation);
 
             const material = new StandardMaterial(`mat_${houseModel}`, scene);
-            material.diffuseColor = Color3.FromHexString("#b69b7f");
+            material.diffuseColor = Color3.FromHexString("#f89752");
+            material.emissiveColor =
+                Color3.FromHexString("#ffffff").scale(0.05);
             // const diffuse = new Texture("/textures/checker.jpg", scene);
             // diffuse.vScale = -1;
             // material.diffuseTexture = diffuse;
