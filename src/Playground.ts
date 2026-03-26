@@ -258,8 +258,7 @@ var playgroundScene = function (
             var timer: ReturnType<typeof setTimeout>;
             var escapeListener: (ev: KeyboardEvent) => void;
             var inspected = false;
-            var plane: Mesh;
-            var infoPlane: Mesh;
+            var meshesToToggleOnInspect: Mesh[] = [];
             attachTriggerSphere(
                 npc_fishGame.meshes[0],
                 [player.getmesh()],
@@ -286,7 +285,8 @@ var playgroundScene = function (
                                 scene,
                             ).then((res) => {
                                 const root = res.meshes[0];
-                                plane = res.meshes[1] as Mesh;
+                                const plane = res.meshes[1] as Mesh;
+                                meshesToToggleOnInspect.push(plane);
                                 root.position =
                                     npc_fishGame.meshes[0].position.add(
                                         new Vector3(6, 6.5, -7),
@@ -363,9 +363,9 @@ var playgroundScene = function (
                                             alpha: 0.25,
                                         },
                                         entrance: {
-                                            durationMs: 380 * 2,
-                                            staggerMs: 65 * 2,
-                                            slidePixels: 44,
+                                            durationMs: 380 * 4,
+                                            staggerMs: 65 * 4,
+                                            slidePixels: 44 * 4,
                                         },
                                         float: {
                                             amplitudePx: 4,
@@ -381,7 +381,8 @@ var playgroundScene = function (
                                 scene,
                             ).then((res) => {
                                 const root = res.meshes[0];
-                                infoPlane = res.meshes[1] as Mesh;
+                                const infoPlane = res.meshes[1] as Mesh;
+                                meshesToToggleOnInspect.push(infoPlane);
                                 root.position =
                                     npc_fishGame.meshes[0].position.add(
                                         new Vector3(6.5, 1.75, -6.5),
@@ -434,7 +435,9 @@ var playgroundScene = function (
                                 scene,
                             ).then((res) => {
                                 const root = res.meshes[0];
-                                const creditsPlane = res.meshes[1] as Mesh;
+                                const thumbnailPlane = res.meshes[1] as Mesh;
+                                meshesToToggleOnInspect.push(thumbnailPlane);
+
                                 root.position =
                                     npc_fishGame.meshes[0].position.add(
                                         new Vector3(-2, 8, 0),
@@ -446,7 +449,7 @@ var playgroundScene = function (
 
                                 var advancedTexture =
                                     GUI.AdvancedDynamicTexture.CreateForMesh(
-                                        creditsPlane,
+                                        thumbnailPlane,
                                     );
 
                                 //background colour
@@ -455,6 +458,7 @@ var playgroundScene = function (
                                 rect.height = "100%";
                                 rect.background = "#171717";
                                 rect.alpha = 0.9;
+                                rect.paddingRight = "12px";
 
                                 //border radius
                                 rect.cornerRadius = 12;
@@ -485,9 +489,16 @@ var playgroundScene = function (
                                 //change cursor to show clickable
                                 thumb.onPointerEnterObservable.add(() => {
                                     document.body.style.cursor = "pointer";
+
+                                    //tint green when hovering
+                                    rect.color = "#00ff00";
+                                    rect.thickness = 16;
                                 });
                                 thumb.onPointerOutObservable.add(() => {
                                     document.body.style.cursor = "default";
+
+                                    rect.color = "#171717";
+                                    rect.thickness = 0;
                                 });
 
                                 //padding
@@ -541,8 +552,11 @@ var playgroundScene = function (
                             escapeListener = (ev: KeyboardEvent) => {
                                 if (ev.key === "Escape") {
                                     transitionToCamera(camera, cameraOffset, 1);
-                                    plane.dispose();
-                                    infoPlane.dispose();
+
+                                    for (const mesh of meshesToToggleOnInspect) {
+                                        mesh.dispose();
+                                    }
+                                    meshesToToggleOnInspect = [];
 
                                     displayTag.isVisible = true;
                                     inspected = false;
@@ -560,8 +574,10 @@ var playgroundScene = function (
                         clearTimeout(timer);
 
                         if (inspected) {
-                            plane.dispose();
-                            infoPlane.dispose();
+                            for (const mesh of meshesToToggleOnInspect) {
+                                mesh.dispose();
+                            }
+                            meshesToToggleOnInspect = [];
                             displayTag.isVisible = true;
                             transitionToCamera(camera, cameraOffset, 1);
                             window.removeEventListener(
