@@ -297,23 +297,23 @@ export function buildPlaygroundMap(
             scene,
             shadows,
         );
-        createHouse(
-            "House3",
-            new Vector3(63, 0, -42),
-            new Vector3(0, 90, 0),
-            scene,
-            shadows,
-        );
+        // createHouse(
+        //     "House3",
+        //     new Vector3(63, 0, -42),
+        //     new Vector3(0, 90, 0),
+        //     scene,
+        //     shadows,
+        // );
 
         const title = create3DText(
             "Village_of_Side_Projects_title",
             data.side_projects.display_name,
-            new Vector3(35, 11, -53),
+            new Vector3(35, 12, -53),
             new Vector3(5, 190, 0),
             Fonts.GEIZER,
         );
 
-        attachBobbing(title, { enabled: true, amplitude: 1, speed: 0.25 });
+        attachBobbing(title, { enabled: true, amplitude: 0.5, speed: 0.25 });
 
         title.renderOutline = true;
         title.outlineWidth = 0.05;

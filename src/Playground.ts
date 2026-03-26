@@ -41,6 +41,7 @@ import {
 } from "./utility/UtilityFunctions";
 
 import { createBentoLayout } from "./utility/BentoBoxLayout";
+import { ProjectNPC } from "./prefabs/NPCs/ProjectNPC";
 
 var playgroundScene = function (
     engine: Engine,
@@ -216,379 +217,422 @@ var playgroundScene = function (
     );
 
     //NPCs
-    ImportCustomModel("StupidFuckingFish", scene).then(
-        (result: ISceneLoaderAsyncResult) => {
-            const npc_fishGame = new NPC(
-                { npcName: "Dumbass Fish Game" },
-                scene,
-                shadows,
-            );
+    // ImportCustomModel("StupidFuckingFish", scene).then(
+    //     (result: ISceneLoaderAsyncResult) => {
+    //         const npc_fishGame = new NPC(
+    //             { npcName: "Dumbass Fish Game" },
+    //             scene,
+    //             shadows,
+    //         );
 
-            npc_fishGame.setModel(result.meshes, 1.5);
-            npc_fishGame.setPosition({ x: 17, y: 0, z: -40 });
-            npc_fishGame.setrotation({ x: 0, y: -90, z: 0 });
-            const texture = new Texture(
-                "/textures/FishWithLegs.png",
-                scene,
-                true,
-                true,
-                Texture.NEAREST_SAMPLINGMODE,
-            );
-            texture.vScale = -1;
-            texture.updateSamplingMode(Texture.NEAREST_SAMPLINGMODE);
-            npc_fishGame.setTexture(texture);
+    //         npc_fishGame.setModel(result.meshes, 1.5);
+    //         npc_fishGame.setPosition({ x: 17, y: 0, z: -40 });
+    //         npc_fishGame.setrotation({ x: 0, y: -90, z: 0 });
+    //         const texture = new Texture(
+    //             "/textures/FishWithLegs.png",
+    //             scene,
+    //             true,
+    //             true,
+    //             Texture.NEAREST_SAMPLINGMODE,
+    //         );
+    //         texture.vScale = -1;
+    //         texture.updateSamplingMode(Texture.NEAREST_SAMPLINGMODE);
+    //         npc_fishGame.setTexture(texture);
 
-            var displayTag = createDisplayTag(
-                npc_fishGame.data.npcName,
-                npc_fishGame.meshes[0],
-                scene,
-                { offset: new Vector3(0, -6, 0) },
-            );
+    //         var displayTag = createDisplayTag(
+    //             npc_fishGame.data.npcName,
+    //             npc_fishGame.meshes[0],
+    //             scene,
+    //             { offset: new Vector3(0, -6, 0) },
+    //         );
 
-            //setup individual NPC camera
-            var fishCamera = new UniversalCamera(
-                "npcCamera",
-                new Vector3(32, 3, -30),
-                scene,
-            );
-            fishCamera.setTarget(
-                npc_fishGame.meshes[0].position.add(new Vector3(0, 6, -10)),
-            );
+    //         //setup individual NPC camera
+    //         var fishCamera = new UniversalCamera(
+    //             "npcCamera",
+    //             new Vector3(32, 3, -30),
+    //             scene,
+    //         );
+    //         fishCamera.setTarget(
+    //             npc_fishGame.meshes[0].position.add(new Vector3(0, 6, -10)),
+    //         );
 
-            var timer: ReturnType<typeof setTimeout>;
-            var escapeListener: (ev: KeyboardEvent) => void;
-            var inspected = false;
-            var meshesToToggleOnInspect: Mesh[] = [];
-            attachTriggerSphere(
-                npc_fishGame.meshes[0],
-                [player.getmesh()],
-                scene,
-                {
-                    radius: 5,
-                    onEnter: () => {
-                        timer = setTimeout(() => {
-                            inspected = true;
+    //         var timer: ReturnType<typeof setTimeout>;
+    //         var escapeListener: (ev: KeyboardEvent) => void;
+    //         var inspected = false;
+    //         var meshesToToggleOnInspect: Mesh[] = [];
+    //         attachTriggerSphere(
+    //             npc_fishGame.meshes[0],
+    //             [player.getmesh()],
+    //             scene,
+    //             {
+    //                 radius: 5,
+    //                 onEnter: () => {
+    //                     timer = setTimeout(() => {
+    //                         inspected = true;
 
-                            transitionToCamera(
-                                fishCamera,
-                                npc_fishGame.meshes[0].position.add(
-                                    new Vector3(0, 6, -8),
-                                ),
-                                1,
-                            );
-                            displayTag.isVisible = false;
+    //                         transitionToCamera(
+    //                             fishCamera,
+    //                             npc_fishGame.meshes[0].position.add(
+    //                                 new Vector3(0, 6, -8),
+    //                             ),
+    //                             1,
+    //                         );
+    //                         displayTag.isVisible = false;
 
-                            player.freeze();
+    //                         player.freeze();
 
-                            ImportMeshAsync(
-                                `/models/CurvedPlane.glb`,
-                                scene,
-                            ).then((res) => {
-                                const root = res.meshes[0];
-                                const plane = res.meshes[1] as Mesh;
-                                meshesToToggleOnInspect.push(plane);
-                                root.position =
-                                    npc_fishGame.meshes[0].position.add(
-                                        new Vector3(6, 6.5, -7),
-                                    );
-                                root.scaling = new Vector3(2.5, 1.5, 1.5);
+    //                         ImportMeshAsync(
+    //                             `/models/CurvedPlane.glb`,
+    //                             scene,
+    //                         ).then((res) => {
+    //                             const root = res.meshes[0];
+    //                             const plane = res.meshes[1] as Mesh;
+    //                             meshesToToggleOnInspect.push(plane);
+    //                             root.position =
+    //                                 npc_fishGame.meshes[0].position.add(
+    //                                     new Vector3(6, 6.5, -7),
+    //                                 );
+    //                             root.scaling = new Vector3(2.5, 1.5, 1.5);
 
-                                root.rotation = Vector3DegreesToRadians(
-                                    new Vector3(-5, 200, 0),
-                                );
+    //                             root.rotation = Vector3DegreesToRadians(
+    //                                 new Vector3(-5, 200, 0),
+    //                             );
 
-                                var advancedTexture =
-                                    GUI.AdvancedDynamicTexture.CreateForMesh(
-                                        plane,
-                                        1024,
-                                        1024,
-                                    );
+    //                             var advancedTexture =
+    //                                 GUI.AdvancedDynamicTexture.CreateForMesh(
+    //                                     plane,
+    //                                     1024,
+    //                                     1024,
+    //                                 );
 
-                                createBentoLayout(
-                                    plane,
-                                    [
-                                        {
-                                            src: "/images/FishGame/Image1.png",
-                                            colSpan: 2,
-                                            rowSpan: 2,
-                                        },
-                                        {
-                                            src: "/images/FishGame/Image2.png",
-                                            colSpan: 2,
-                                            rowSpan: 2,
-                                        },
-                                        {
-                                            src: "/images/FishGame/DFG_Vid1.mp4",
-                                            colSpan: 4,
-                                            rowSpan: 4,
-                                        },
-                                        {
-                                            src: "/images/FishGame/Image3.png",
-                                            colSpan: 3,
-                                            rowSpan: 3,
-                                        },
-                                        {
-                                            src: "/images/FishGame/Image4.png",
-                                            colSpan: 1,
-                                            rowSpan: 1,
-                                        },
-                                        {
-                                            src: "/images/FishGame/DFG_Vid2.mp4",
-                                            colSpan: 3,
-                                            rowSpan: 3,
-                                        },
-                                        {
-                                            src: "/images/FishGame/Image5.png",
-                                            colSpan: 2,
-                                            rowSpan: 2,
-                                        },
-                                        {
-                                            src: "/images/FishGame/Image6.png",
-                                            colSpan: 1,
-                                            rowSpan: 1,
-                                        },
-                                    ],
-                                    {
-                                        columns: 8,
-                                        rows: 8,
-                                        gap: 8,
-                                        padding: 6,
-                                        cornerRadius: 0,
-                                        textureWidth: 1024,
-                                        textureHeight: 1024,
+    //                             createBentoLayout(
+    //                                 plane,
+    //                                 [
+    //                                     {
+    //                                         src: "/images/FishGame/Image1.png",
+    //                                         colSpan: 2,
+    //                                         rowSpan: 2,
+    //                                     },
+    //                                     {
+    //                                         src: "/images/FishGame/Image2.png",
+    //                                         colSpan: 2,
+    //                                         rowSpan: 2,
+    //                                     },
+    //                                     {
+    //                                         src: "/images/FishGame/DFG_Vid1.mp4",
+    //                                         colSpan: 4,
+    //                                         rowSpan: 4,
+    //                                     },
+    //                                     {
+    //                                         src: "/images/FishGame/Image3.png",
+    //                                         colSpan: 3,
+    //                                         rowSpan: 3,
+    //                                     },
+    //                                     {
+    //                                         src: "/images/FishGame/Image4.png",
+    //                                         colSpan: 1,
+    //                                         rowSpan: 1,
+    //                                     },
+    //                                     {
+    //                                         src: "/images/FishGame/DFG_Vid2.mp4",
+    //                                         colSpan: 3,
+    //                                         rowSpan: 3,
+    //                                     },
+    //                                     {
+    //                                         src: "/images/FishGame/Image5.png",
+    //                                         colSpan: 2,
+    //                                         rowSpan: 2,
+    //                                     },
+    //                                     {
+    //                                         src: "/images/FishGame/Image6.png",
+    //                                         colSpan: 1,
+    //                                         rowSpan: 1,
+    //                                     },
+    //                                 ],
+    //                                 {
+    //                                     columns: 8,
+    //                                     rows: 8,
+    //                                     gap: 8,
+    //                                     padding: 6,
+    //                                     cornerRadius: 0,
+    //                                     textureWidth: 1024,
+    //                                     textureHeight: 1024,
 
-                                        cellBorder: {
-                                            color: "#ffddaa",
-                                            thickness: 0,
-                                            alpha: 0.25,
-                                        },
-                                        entrance: {
-                                            durationMs: 380 * 4,
-                                            staggerMs: 65 * 4,
-                                            slidePixels: 44 * 4,
-                                        },
-                                        float: {
-                                            amplitudePx: 4,
-                                            periodMs: 3000,
-                                            phaseOffsetMs: 350,
-                                        },
-                                    },
-                                );
-                            });
+    //                                     cellBorder: {
+    //                                         color: "#ffddaa",
+    //                                         thickness: 0,
+    //                                         alpha: 0.25,
+    //                                     },
+    //                                     entrance: {
+    //                                         durationMs: 380 * 4,
+    //                                         staggerMs: 65 * 4,
+    //                                         slidePixels: 44 * 4,
+    //                                     },
+    //                                     float: {
+    //                                         amplitudePx: 4,
+    //                                         periodMs: 3000,
+    //                                         phaseOffsetMs: 350,
+    //                                     },
+    //                                 },
+    //                             );
+    //                         });
 
-                            ImportMeshAsync(
-                                "/models/CurvedPlane.glb",
-                                scene,
-                            ).then((res) => {
-                                const root = res.meshes[0];
-                                const infoPlane = res.meshes[1] as Mesh;
-                                meshesToToggleOnInspect.push(infoPlane);
-                                root.position =
-                                    npc_fishGame.meshes[0].position.add(
-                                        new Vector3(6.5, 1.75, -6.5),
-                                    );
-                                root.scaling = new Vector3(1, 1.1, 1).scale(2);
+    //                         ImportMeshAsync(
+    //                             "/models/CurvedPlane.glb",
+    //                             scene,
+    //                         ).then((res) => {
+    //                             const root = res.meshes[0];
+    //                             const infoPlane = res.meshes[1] as Mesh;
+    //                             meshesToToggleOnInspect.push(infoPlane);
+    //                             root.position =
+    //                                 npc_fishGame.meshes[0].position.add(
+    //                                     new Vector3(6.5, 1.75, -6.5),
+    //                                 );
+    //                             root.scaling = new Vector3(1, 1.1, 1).scale(2);
 
-                                root.rotation = Vector3DegreesToRadians(
-                                    new Vector3(0, 200, 0.5),
-                                );
+    //                             root.rotation = Vector3DegreesToRadians(
+    //                                 new Vector3(0, 200, 0.5),
+    //                             );
 
-                                var advancedTexture =
-                                    GUI.AdvancedDynamicTexture.CreateForMesh(
-                                        infoPlane,
-                                    );
+    //                             var advancedTexture =
+    //                                 GUI.AdvancedDynamicTexture.CreateForMesh(
+    //                                     infoPlane,
+    //                                 );
 
-                                //background colour
-                                const rect = new GUI.Rectangle();
-                                rect.width = "100%";
-                                rect.height = "25%";
-                                rect.background = "#171717";
-                                rect.alpha = 0.5;
-                                rect.cornerRadius = 6;
+    //                             //background colour
+    //                             const rect = new GUI.Rectangle();
+    //                             rect.width = "100%";
+    //                             rect.height = "25%";
+    //                             rect.background = "#171717";
+    //                             rect.alpha = 0.5;
+    //                             rect.cornerRadius = 6;
 
-                                advancedTexture.addControl(rect);
+    //                             advancedTexture.addControl(rect);
 
-                                const textBlock = new GUI.TextBlock();
-                                textBlock.text =
-                                    "This project serves as a personal reminder that the experience conveyed is often more valuable than the game itself. Made solely for the memes, this is my joke game that became my best performing game jam submission. Scoring 84th in a 500 submission game jam, this is my 'this did well somehow' project I will never forget.";
-                                textBlock.fontFamily = "Mustica";
-                                textBlock.fontSize = 30;
-                                textBlock.color = "#ffffff";
-                                textBlock.outlineWidth = 4;
-                                textBlock.outlineColor = "#000000";
-                                textBlock.textWrapping =
-                                    GUI.TextWrapping.WordWrap;
-                                textBlock.width = "100%";
-                                textBlock.height = "100%";
-                                var padding = 24;
-                                textBlock.paddingTop = padding + "px";
-                                textBlock.paddingRight = padding + "px";
-                                textBlock.paddingBottom = padding + "px";
-                                textBlock.paddingLeft = padding + "px";
-                                textBlock.verticalAlignment =
-                                    GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    //                             const textBlock = new GUI.TextBlock();
+    //                             textBlock.text =
+    //                                 "This project serves as a personal reminder that the experience conveyed is often more valuable than the game itself. Made solely for the memes, this is my joke game that became my best performing game jam submission. Scoring 84th in a 500 submission game jam, this is my 'this did well somehow' project I will never forget.";
+    //                             textBlock.fontFamily = "Mustica";
+    //                             textBlock.fontSize = 30;
+    //                             textBlock.color = "#ffffff";
+    //                             textBlock.outlineWidth = 4;
+    //                             textBlock.outlineColor = "#000000";
+    //                             textBlock.textWrapping =
+    //                                 GUI.TextWrapping.WordWrap;
+    //                             textBlock.width = "100%";
+    //                             textBlock.height = "100%";
+    //                             var padding = 24;
+    //                             textBlock.paddingTop = padding + "px";
+    //                             textBlock.paddingRight = padding + "px";
+    //                             textBlock.paddingBottom = padding + "px";
+    //                             textBlock.paddingLeft = padding + "px";
+    //                             textBlock.verticalAlignment =
+    //                                 GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
-                                advancedTexture.addControl(textBlock);
-                            });
-                            ImportMeshAsync(
-                                "/models/CurvedPlane.glb",
-                                scene,
-                            ).then((res) => {
-                                const root = res.meshes[0];
-                                const thumbnailPlane = res.meshes[1] as Mesh;
-                                meshesToToggleOnInspect.push(thumbnailPlane);
+    //                             advancedTexture.addControl(textBlock);
+    //                         });
+    //                         ImportMeshAsync(
+    //                             "/models/CurvedPlane.glb",
+    //                             scene,
+    //                         ).then((res) => {
+    //                             const root = res.meshes[0];
+    //                             const thumbnailPlane = res.meshes[1] as Mesh;
+    //                             meshesToToggleOnInspect.push(thumbnailPlane);
 
-                                root.position =
-                                    npc_fishGame.meshes[0].position.add(
-                                        new Vector3(-2, 8, 0),
-                                    );
-                                root.rotation = Vector3DegreesToRadians(
-                                    new Vector3(0, 240, -2),
-                                );
-                                root.scaling = new Vector3(1, 1, 1).scale(1);
+    //                             root.position =
+    //                                 npc_fishGame.meshes[0].position.add(
+    //                                     new Vector3(-2, 8, 0),
+    //                                 );
+    //                             root.rotation = Vector3DegreesToRadians(
+    //                                 new Vector3(0, 240, -2),
+    //                             );
+    //                             root.scaling = new Vector3(1, 1, 1).scale(1);
 
-                                var advancedTexture =
-                                    GUI.AdvancedDynamicTexture.CreateForMesh(
-                                        thumbnailPlane,
-                                    );
+    //                             var advancedTexture =
+    //                                 GUI.AdvancedDynamicTexture.CreateForMesh(
+    //                                     thumbnailPlane,
+    //                                 );
 
-                                //background colour
-                                const rect = new GUI.Rectangle();
-                                rect.width = "100%";
-                                rect.height = "100%";
-                                rect.background = "#171717";
-                                rect.alpha = 0.9;
-                                rect.paddingRight = "12px";
+    //                             //background colour
+    //                             const rect = new GUI.Rectangle();
+    //                             rect.width = "100%";
+    //                             rect.height = "100%";
+    //                             rect.background = "#171717";
+    //                             rect.alpha = 0.9;
+    //                             rect.paddingRight = "12px";
 
-                                //border radius
-                                rect.cornerRadius = 12;
+    //                             //border radius
+    //                             rect.cornerRadius = 12;
 
-                                advancedTexture.addControl(rect);
+    //                             advancedTexture.addControl(rect);
 
-                                //game thumbnail
-                                const thumb = new GUI.Image();
-                                thumb.source = "/images/FishGame/Thumbnail.png";
+    //                             //game thumbnail
+    //                             const thumb = new GUI.Image();
+    //                             thumb.source = "/images/FishGame/Thumbnail.png";
 
-                                thumb.width = "100%";
-                                thumb.height = "75%";
-                                thumb.stretch = GUI.Image.STRETCH_UNIFORM;
+    //                             thumb.width = "100%";
+    //                             thumb.height = "75%";
+    //                             thumb.stretch = GUI.Image.STRETCH_UNIFORM;
 
-                                thumb.verticalAlignment =
-                                    GUI.Control.VERTICAL_ALIGNMENT_TOP;
-                                thumb.horizontalAlignment =
-                                    GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-                                advancedTexture.addControl(thumb);
+    //                             thumb.verticalAlignment =
+    //                                 GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    //                             thumb.horizontalAlignment =
+    //                                 GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    //                             advancedTexture.addControl(thumb);
 
-                                thumb.onPointerClickObservable.add(() => {
-                                    window.open(
-                                        "https://unscriptedlogic.itch.io/dumbass-fish-game",
-                                        "_blank",
-                                    );
-                                });
+    //                             thumb.onPointerClickObservable.add(() => {
+    //                                 window.open(
+    //                                     "https://unscriptedlogic.itch.io/dumbass-fish-game",
+    //                                     "_blank",
+    //                                 );
+    //                             });
 
-                                //change cursor to show clickable
-                                thumb.onPointerEnterObservable.add(() => {
-                                    document.body.style.cursor = "pointer";
+    //                             //change cursor to show clickable
+    //                             thumb.onPointerEnterObservable.add(() => {
+    //                                 document.body.style.cursor = "pointer";
 
-                                    //tint green when hovering
-                                    rect.color = "#00ff00";
-                                    rect.thickness = 16;
-                                });
-                                thumb.onPointerOutObservable.add(() => {
-                                    document.body.style.cursor = "default";
+    //                                 //tint green when hovering
+    //                                 rect.color = "#00ff00";
+    //                                 rect.thickness = 16;
+    //                             });
+    //                             thumb.onPointerOutObservable.add(() => {
+    //                                 document.body.style.cursor = "default";
 
-                                    rect.color = "#171717";
-                                    rect.thickness = 0;
-                                });
+    //                                 rect.color = "#171717";
+    //                                 rect.thickness = 0;
+    //                             });
 
-                                //padding
-                                const padding = 48;
-                                thumb.paddingTop = `${padding + 78}px`;
-                                thumb.paddingBottom = `${padding}px`;
-                                thumb.paddingLeft = `${padding}px`;
-                                thumb.paddingRight = `${padding}px`;
+    //                             //padding
+    //                             const padding = 48;
+    //                             thumb.paddingTop = `${padding + 78}px`;
+    //                             thumb.paddingBottom = `${padding}px`;
+    //                             thumb.paddingLeft = `${padding}px`;
+    //                             thumb.paddingRight = `${padding}px`;
 
-                                //Play The Game Text Header
-                                const header = new GUI.TextBlock();
-                                header.text = "Play The Game";
-                                header.width = "80%";
-                                header.height = "10%";
-                                header.fontFamily = "Geizer";
-                                header.fontSize = 80;
-                                header.color = "#ffffff";
-                                header.outlineWidth = 4;
-                                header.outlineColor = "#000000";
-                                header.paddingTop = `${padding}px`;
-                                header.verticalAlignment =
-                                    GUI.Control.VERTICAL_ALIGNMENT_TOP;
-                                header.horizontalAlignment =
-                                    GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    //                             //Play The Game Text Header
+    //                             const header = new GUI.TextBlock();
+    //                             header.text = "Play The Game";
+    //                             header.width = "80%";
+    //                             header.height = "10%";
+    //                             header.fontFamily = "Geizer";
+    //                             header.fontSize = 80;
+    //                             header.color = "#ffffff";
+    //                             header.outlineWidth = 4;
+    //                             header.outlineColor = "#000000";
+    //                             header.paddingTop = `${padding}px`;
+    //                             header.verticalAlignment =
+    //                                 GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    //                             header.horizontalAlignment =
+    //                                 GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
 
-                                advancedTexture.addControl(header);
+    //                             advancedTexture.addControl(header);
 
-                                const textBlock = new GUI.TextBlock();
-                                textBlock.text =
-                                    "You're a fish that sells fish to fish people. Made with Blender, BlockBench and Unity for the Fishy Game Jam 2024";
-                                textBlock.fontFamily = "Mustica";
-                                textBlock.fontSize = 42;
-                                textBlock.color = "#ffffff";
-                                textBlock.outlineWidth = 4;
-                                textBlock.outlineColor = "#000000";
-                                textBlock.textWrapping =
-                                    GUI.TextWrapping.WordWrap;
-                                textBlock.width = "100%";
-                                textBlock.height = "30%";
-                                textBlock.paddingTop = `${padding}px`;
-                                textBlock.paddingBottom = `${padding}px`;
-                                textBlock.paddingLeft = `${padding}px`;
-                                textBlock.paddingRight = `${padding}px`;
-                                textBlock.verticalAlignment =
-                                    GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+    //                             const textBlock = new GUI.TextBlock();
+    //                             textBlock.text =
+    //                                 "You're a fish that sells fish to fish people. Made with Blender, BlockBench and Unity for the Fishy Game Jam 2024";
+    //                             textBlock.fontFamily = "Mustica";
+    //                             textBlock.fontSize = 42;
+    //                             textBlock.color = "#ffffff";
+    //                             textBlock.outlineWidth = 4;
+    //                             textBlock.outlineColor = "#000000";
+    //                             textBlock.textWrapping =
+    //                                 GUI.TextWrapping.WordWrap;
+    //                             textBlock.width = "100%";
+    //                             textBlock.height = "30%";
+    //                             textBlock.paddingTop = `${padding}px`;
+    //                             textBlock.paddingBottom = `${padding}px`;
+    //                             textBlock.paddingLeft = `${padding}px`;
+    //                             textBlock.paddingRight = `${padding}px`;
+    //                             textBlock.verticalAlignment =
+    //                                 GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
 
-                                advancedTexture.addControl(textBlock);
-                            });
+    //                             advancedTexture.addControl(textBlock);
+    //                         });
 
-                            //if the player presses escape while in the trigger, transition back to the main camera immediately
-                            escapeListener = (ev: KeyboardEvent) => {
-                                if (ev.key === "Escape") {
-                                    transitionToCamera(camera, cameraOffset, 1);
+    //                         //if the player presses escape while in the trigger, transition back to the main camera immediately
+    //                         escapeListener = (ev: KeyboardEvent) => {
+    //                             if (ev.key === "Escape") {
+    //                                 transitionToCamera(camera, cameraOffset, 1);
 
-                                    for (const mesh of meshesToToggleOnInspect) {
-                                        mesh.dispose();
-                                    }
-                                    meshesToToggleOnInspect = [];
+    //                                 for (const mesh of meshesToToggleOnInspect) {
+    //                                     mesh.dispose();
+    //                                 }
+    //                                 meshesToToggleOnInspect = [];
 
-                                    displayTag.isVisible = true;
-                                    inspected = false;
-                                    window.removeEventListener(
-                                        "keydown",
-                                        escapeListener,
-                                    );
-                                    clearTimeout(timer);
-                                }
-                            };
-                            window.addEventListener("keydown", escapeListener);
-                        }, 1000);
-                    },
-                    onExit: () => {
-                        clearTimeout(timer);
+    //                                 displayTag.isVisible = true;
+    //                                 inspected = false;
+    //                                 window.removeEventListener(
+    //                                     "keydown",
+    //                                     escapeListener,
+    //                                 );
+    //                                 clearTimeout(timer);
+    //                             }
+    //                         };
+    //                         window.addEventListener("keydown", escapeListener);
+    //                     }, 1000);
+    //                 },
+    //                 onExit: () => {
+    //                     clearTimeout(timer);
 
-                        if (inspected) {
-                            for (const mesh of meshesToToggleOnInspect) {
-                                mesh.dispose();
-                            }
-                            meshesToToggleOnInspect = [];
-                            displayTag.isVisible = true;
-                            transitionToCamera(camera, cameraOffset, 1);
-                            window.removeEventListener(
-                                "keydown",
-                                escapeListener,
-                            );
-                        }
-                    },
-                },
-            );
+    //                     if (inspected) {
+    //                         for (const mesh of meshesToToggleOnInspect) {
+    //                             mesh.dispose();
+    //                         }
+    //                         meshesToToggleOnInspect = [];
+    //                         displayTag.isVisible = true;
+    //                         transitionToCamera(camera, cameraOffset, 1);
+    //                         window.removeEventListener(
+    //                             "keydown",
+    //                             escapeListener,
+    //                         );
+    //                     }
+    //                 },
+    //             },
+    //         );
+    //     },
+    // );
+
+    const npc_fishGame = new ProjectNPC(
+        {
+            npcName: "Dumbass Fish Game",
+            modelPosition: new Vector3(17, 0, -45),
+            modelRotation: new Vector3(0, -90, 0),
+            player,
+            camera,
+            cameraOffset: new Vector3(13, 3, 13),
         },
+        scene,
+        shadows,
+    );
+
+    const npc_vizion = new ProjectNPC(
+        {
+            npcName: "Vizion",
+            modelName: "Vizion",
+            textureName: "/textures/Vizion.png",
+            modelPosition: new Vector3(35, 0.5, -50),
+            modelRotation: new Vector3(0, 15, 0),
+            player,
+            camera,
+            cameraOffset: new Vector3(13, 3, 13),
+            gameUrl: "https://unscriptedlogic.itch.io/vizion",
+            gameDescription:
+                "To see is to have the information, to hear is to have the step ahead. To execute, now that's up to you. A game created for the Mix and Game Jam 2020.",
+            description:
+                "Vizion was my first step into the world of shaders, learning about the Z-index, stencils and depth passes. The dark magic that elevates visuals to a different dimension. This game was centered around this 1 shader that I learned how to make and just went with it. The horror aspect of the game is, little to none. At the most you'll be slightly unsettled by the audio. It was a fun experiment and I'm glad I made it.",
+            textBlockOffset: new Vector3(5.25, 1.75, -5.25),
+            thumbnailImage: "/images/Vizion/Thumbnail.png",
+            bentoImages: [
+                { src: "/images/Vizion/Video2.mp4", colSpan: 3, rowSpan: 3 },
+                { src: "/images/Vizion/Image1.jpg", colSpan: 1, rowSpan: 1 },
+                { src: "/images/Vizion/Image2.jpg", colSpan: 2, rowSpan: 2 },
+                { src: "/images/Vizion/Video1.mp4", colSpan: 5, rowSpan: 5 },
+                { src: "/images/Vizion/Image3.jpg", colSpan: 3, rowSpan: 3 },
+                { src: "/images/Vizion/Image4.jpg", colSpan: 2, rowSpan: 2 },
+            ],
+        },
+        scene,
+        shadows,
     );
 
     scene.onBeforeRenderObservable.add(() => {
