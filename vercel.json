@@ -1,3 +1,25 @@
 {
-    "rewrites": [{ "source": "/((?!models/).*)", "destination": "/index.html" }]
+    "rewrites": [
+        { "source": "/((?!models/).*)", "destination": "/index.html" }
+    ],
+    "headers": [
+        {
+            "source": "/(.*).glb",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "model/gltf-binary"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).gltf",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "model/gltf+json"
+                }
+            ]
+        }
+    ]
 }
