@@ -2,6 +2,10 @@
     "rewrites": [
         { "source": "/((?!models/).*)", "destination": "/index.html" }
     ],
+    "routes": [
+        { "src": "/models/(.*)", "dest": "/models/$1" },
+        { "src": "/(.*)", "dest": "/index.html" }
+    ],
     "headers": [
         {
             "source": "/(.*).glb",
