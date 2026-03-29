@@ -5,6 +5,7 @@ import HavokPhysics from "@babylonjs/havok";
 import { Engine, HavokPlugin } from "@babylonjs/core";
 import playgroundScene from "./Playground";
 import earcut from "earcut";
+import { registerBuiltInLoaders } from "@babylonjs/loaders";
 
 async function getInitializedHavok() {
     return await HavokPhysics();
@@ -32,6 +33,8 @@ class App {
         this.canvas.style.height = "100%";
         this.canvas.id = "gameCanvas";
         document.body.appendChild(this.canvas);
+
+        registerBuiltInLoaders();
 
         // initialize babylon scene and engine
         var engine = new Engine(this.canvas, true);
