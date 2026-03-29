@@ -20,6 +20,7 @@ import {
 import * as GUI from "@babylonjs/gui";
 import { Interpolation, Tween } from "@tweenjs/tween.js";
 import { Fonts } from "../manager/fontmanager";
+import "@babylonjs/loaders/glTF";
 
 export const ImportCustomModel = async (fileName: string, scene: Scene) => {
     const result = ImportMeshAsync(`/models/Mesh_${fileName}.glb`, scene);
