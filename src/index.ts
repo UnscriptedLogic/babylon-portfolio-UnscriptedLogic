@@ -1,6 +1,6 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
-import "@babylonjs/loaders/glTF";
+import "@babylonjs/loaders";
 import HavokPhysics from "@babylonjs/havok";
 import { Engine, HavokPlugin } from "@babylonjs/core";
 import playgroundScene from "./Playground";
