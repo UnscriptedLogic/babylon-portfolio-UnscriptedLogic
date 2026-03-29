@@ -41,7 +41,15 @@ module.exports = {
             template: path.resolve(appDirectory, "public/index.html"),
         }),
         new CopyPlugin({
-            patterns: [{ from: "public", to: "" }],
+            patterns: [
+                {
+                    from: "public",
+                    to: "",
+                    globOptions: {
+                        ignore: ["**/index.html"], // 👈 THIS LINE FIXES IT
+                    },
+                },
+            ],
         }),
     ],
     mode: "development",
