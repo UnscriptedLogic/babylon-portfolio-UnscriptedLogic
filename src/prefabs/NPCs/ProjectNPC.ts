@@ -44,9 +44,13 @@ export type ProjectNPCSettings = NPCSettings & {
     thumbnailRotation?: Vector3;
     bentoOffset?: Vector3;
     bentoRotation?: Vector3;
+    onTriggerEnter?: () => void;
+    onTriggerExit?: () => void;
 };
 
 export class ProjectNPC extends NPC {
+    displayTag: Mesh;
+
     constructor(
         settings: ProjectNPCSettings,
         scene: Scene,
@@ -58,6 +62,7 @@ export class ProjectNPC extends NPC {
             settings.modelName || "StupidFuckingFish",
             scene,
         ).then((result: ISceneLoaderAsyncResult) => {
+            this.meshes = result.meshes;
             const npc_fishGame = new NPC(
                 { npcName: settings.npcName },
                 scene,
@@ -82,7 +87,7 @@ export class ProjectNPC extends NPC {
                 settings.modelOutlineWidth,
             );
 
-            var displayTag = createDisplayTag(
+            this.displayTag = createDisplayTag(
                 npc_fishGame.data.npcName,
                 npc_fishGame.meshes[0],
                 scene,
@@ -115,6 +120,10 @@ export class ProjectNPC extends NPC {
                         timer = setTimeout(() => {
                             inspected = true;
 
+                            if (settings.onTriggerEnter) {
+                                settings.onTriggerEnter();
+                            }
+
                             transitionToCamera(
                                 npcCam,
                                 npc_fishGame.meshes[0].position.add(
@@ -122,7 +131,7 @@ export class ProjectNPC extends NPC {
                                 ),
                                 1,
                             );
-                            displayTag.isVisible = false;
+                            this.displayTag.isVisible = false;
 
                             settings.player.freeze();
 
@@ -419,8 +428,13 @@ export class ProjectNPC extends NPC {
                                     }
                                     meshesToToggleOnInspect = [];
 
-                                    displayTag.isVisible = true;
+                                    this.displayTag.isVisible = true;
                                     inspected = false;
+
+                                    if (settings.onTriggerExit) {
+                                        settings.onTriggerExit();
+                                    }
+
                                     window.removeEventListener(
                                         "keydown",
                                         escapeListener,
@@ -432,6 +446,9 @@ export class ProjectNPC extends NPC {
                         }, 1000);
                     },
                     onExit: () => {
+                        if (settings.onTriggerExit) {
+                            settings.onTriggerExit();
+                        }
                         clearTimeout(timer);
 
                         if (inspected) {
@@ -439,7 +456,7 @@ export class ProjectNPC extends NPC {
                                 mesh.dispose();
                             }
                             meshesToToggleOnInspect = [];
-                            displayTag.isVisible = true;
+                            this.displayTag.isVisible = true;
                             transitionToCamera(
                                 settings.camera,
                                 settings.cameraOffset,
@@ -454,5 +471,16 @@ export class ProjectNPC extends NPC {
                 },
             );
         });
+    }
+
+    setVisibility(isVisible: boolean) {
+        for (const mesh of this.meshes) {
+            if (mesh.getTotalVertices() <= 0) continue;
+            mesh.isVisible = isVisible;
+        }
+
+        if (this.displayTag) {
+            this.displayTag.isVisible = isVisible;
+        }
     }
 }

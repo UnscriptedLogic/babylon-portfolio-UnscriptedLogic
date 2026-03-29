@@ -22,6 +22,7 @@ import { Fonts as Fonts } from "../manager/fontmanager";
 import earcut from "earcut";
 import { attachBobbing } from "../utility/Bobbing";
 import {
+    EachLetterPhysics,
     ImportCustomModel,
     Vector3DegreesToRadians,
 } from "../utility/UtilityFunctions";
@@ -391,81 +392,124 @@ export function buildPlaygroundMap(
         const { display_name } = data;
         const [firstName, lastName] = display_name.split(" ");
 
-        const first_name = create3DText(
+        // const first_name = create3DText(
+        //     firstName,
+        //     firstName,
+        //     new Vector3(15, 1, -15),
+        //     new Vector3(0, -180, 0),
+        //     Fonts.MUSTICA,
+        //     4,
+        //     0.5,
+        // );
+
+        const first_name = EachLetterPhysics(
             firstName,
-            firstName,
-            new Vector3(15, 1, -15),
-            new Vector3(0, -180, 0),
-            Fonts.MUSTICA,
-            4,
-            0.5,
-        );
-
-        first_name.renderOutline = true;
-        first_name.outlineWidth = 0.05;
-        first_name.outlineColor = new Color3(0, 0, 0);
-
-        shadows.addShadowCaster(first_name, true);
-
-        new PhysicsAggregate(
-            first_name,
-            PhysicsShapeType.BOX,
-            { mass: 20, restitution: 0.4, friction: 0.9 },
             scene,
+            new Vector3(23, 1, -15),
+            new Vector3(0, -180, 0),
+            earcut,
+            {
+                size: 4,
+                depth: 1,
+                spacing: -6.5,
+                font: Fonts.MUSTICA,
+                forEach: (letter, index, mesh) => {
+                    mesh.renderOutline = true;
+                    mesh.outlineWidth = 0.05;
+                    mesh.outlineColor = new Color3(0, 0, 0);
+
+                    shadows.addShadowCaster(mesh, true);
+
+                    new PhysicsAggregate(
+                        mesh,
+                        PhysicsShapeType.BOX,
+                        { mass: 10, restitution: 0.4, friction: 0.9 },
+                        scene,
+                    );
+                },
+            },
         );
 
-        const last_name = create3DText(
+        // const last_name = create3DText(
+        //     lastName,
+        //     lastName,
+        //     new Vector3(-7, 1, -15),
+        //     new Vector3(0, -180, 0),
+        //     Fonts.MUSTICA,
+        //     4,
+        //     0.5,
+        // );
+
+        // last_name.renderOutline = true;
+        // last_name.outlineWidth = 0.05;
+        // last_name.outlineColor = new Color3(0, 0, 0);
+
+        // shadows.addShadowCaster(last_name, true);
+
+        // new PhysicsAggregate(
+        //     last_name,
+        //     PhysicsShapeType.BOX,
+        //     { mass: 20, restitution: 0.4, friction: 0.9 },
+        //     scene,
+        // );
+
+        const last_name = EachLetterPhysics(
             lastName,
-            lastName,
+            scene,
             new Vector3(-7, 1, -15),
             new Vector3(0, -180, 0),
-            Fonts.MUSTICA,
-            4,
-            0.5,
+            earcut,
+            {
+                size: 4,
+                depth: 1,
+                spacing: -6.25,
+                font: Fonts.MUSTICA,
+                forEach: (letter, index, mesh) => {
+                    mesh.renderOutline = true;
+                    mesh.outlineWidth = 0.05;
+                    mesh.outlineColor = new Color3(0, 0, 0);
+
+                    shadows.addShadowCaster(mesh, true);
+
+                    new PhysicsAggregate(
+                        mesh,
+                        PhysicsShapeType.BOX,
+                        { mass: 10, restitution: 0.4, friction: 0.9 },
+                        scene,
+                    );
+                },
+            },
         );
 
-        last_name.renderOutline = true;
-        last_name.outlineWidth = 0.05;
-        last_name.outlineColor = new Color3(0, 0, 0);
+        // setTimeout(() => {
+        //     const portfolio = create3DText(
+        //         "Portfolio",
+        //         "Portfolio",
+        //         new Vector3(0, 7, 30),
+        //         new Vector3(0, -180, 0),
+        //         Fonts.MUSTICA,
+        //         4,
+        //         0.5,
+        //     );
 
-        shadows.addShadowCaster(last_name, true);
+        //     portfolio.renderOutline = true;
+        //     portfolio.outlineWidth = 0.05;
+        //     portfolio.outlineColor = new Color3(0, 0, 0);
 
-        new PhysicsAggregate(
-            last_name,
-            PhysicsShapeType.BOX,
-            { mass: 20, restitution: 0.4, friction: 0.9 },
-            scene,
-        );
+        //     shadows.addShadowCaster(portfolio, true);
 
-        setTimeout(() => {
-            const portfolio = create3DText(
-                "Portfolio",
-                "Portfolio",
-                new Vector3(0, 7, 30),
-                new Vector3(0, -180, 0),
-                Fonts.MUSTICA,
-                4,
-                0.5,
-            );
+        //     const portfolioPhysics = new PhysicsAggregate(
+        //         portfolio,
+        //         PhysicsShapeType.BOX,
+        //         { mass: 10, restitution: 0.75, friction: 0.9 },
+        //         scene,
+        //     );
 
-            portfolio.renderOutline = true;
-            portfolio.outlineWidth = 0.05;
-            portfolio.outlineColor = new Color3(0, 0, 0);
-
-            shadows.addShadowCaster(portfolio, true);
-
-            const portfolioPhysics = new PhysicsAggregate(
-                portfolio,
-                PhysicsShapeType.BOX,
-                { mass: 10, restitution: 0.75, friction: 0.9 },
-                scene,
-            );
-
-            portfolioPhysics.body.applyImpulse(
-                new Vector3(0, 50, -500),
-                portfolio.getAbsolutePosition().add(new Vector3(0, 3, 0)),
-            );
-        }, 1000);
+        //     portfolioPhysics.body.applyImpulse(
+        //         new Vector3(0, 50, -500),
+        //         portfolio.getAbsolutePosition().add(new Vector3(0, 3, 0)),
+        //     );
+        // }, 1000);
     };
 
     createHub();

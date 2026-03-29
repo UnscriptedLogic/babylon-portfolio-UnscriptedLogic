@@ -8,6 +8,7 @@ import {
     EasingFunction,
     ExecuteCodeAction,
     ExponentialEase,
+    IFontData,
     ImportMeshAsync,
     MeshBuilder,
     PowerEase,
@@ -18,6 +19,7 @@ import {
 } from "@babylonjs/core";
 import * as GUI from "@babylonjs/gui";
 import { Interpolation, Tween } from "@tweenjs/tween.js";
+import { Fonts } from "../manager/fontmanager";
 
 export const ImportCustomModel = async (fileName: string, scene: Scene) => {
     const result = ImportMeshAsync(`/models/Mesh_${fileName}.glb`, scene);
@@ -181,4 +183,49 @@ export const transitionToCamera = (
         1,
         () => {},
     );
+};
+
+export type EachLetterPhysicsConfig = {
+    size?: number;
+    depth?: number;
+    spacing?: number;
+    font?: IFontData;
+    forEach?: (letter: string, index: number, mesh: AbstractMesh) => void;
+};
+
+export const EachLetterPhysics = (
+    text: string,
+    scene: Scene,
+    position: Vector3,
+    rotation: Vector3,
+    earcut: any,
+    config?: EachLetterPhysicsConfig,
+) => {
+    const letters = text.split("");
+    const letterMeshes: AbstractMesh[] = [];
+
+    letters.forEach((letter, index) => {
+        const letterMesh = MeshBuilder.CreateText(
+            `letter_${letter}_${index}`,
+            letter,
+            config?.font ?? Fonts.MUSTICA,
+            { size: config?.size ?? 0.5, depth: config?.depth ?? 0.1 },
+            scene,
+            earcut,
+        );
+        letterMesh.position = position.add(
+            new Vector3(
+                index * ((config?.size ?? 0.5) + (config?.spacing ?? 0)) * 1.2,
+                0,
+                0,
+            ),
+        );
+        letterMesh.rotation = Vector3DegreesToRadians(rotation);
+        letterMeshes.push(letterMesh);
+
+        if (config?.forEach) {
+            config.forEach(letter, index, letterMesh);
+        }
+    });
+    return letterMeshes;
 };
