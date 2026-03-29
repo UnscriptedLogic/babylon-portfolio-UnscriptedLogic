@@ -8,6 +8,7 @@ import {
     Texture,
     UniversalCamera,
     Vector3,
+    Color3,
 } from "@babylonjs/core";
 import { NPC, NPCSettings } from "../NPC";
 import { BentoCell, createBentoLayout } from "../../utility/BentoBoxLayout";
@@ -26,6 +27,7 @@ export type ProjectNPCSettings = NPCSettings & {
     modelName?: string;
     modelPosition: Vector3;
     modelRotation: Vector3;
+    modelOutlineWidth?: number;
     textureName?: string;
     bentoImages?: BentoCell[];
     thumbnailImage?: string;
@@ -37,6 +39,11 @@ export type ProjectNPCSettings = NPCSettings & {
     cameraOffset: Vector3;
     cameraTargetOffset?: Vector3;
     textBlockOffset?: Vector3;
+    textBlockRotation?: Vector3;
+    thumbnailOffset?: Vector3;
+    thumbnailRotation?: Vector3;
+    bentoOffset?: Vector3;
+    bentoRotation?: Vector3;
 };
 
 export class ProjectNPC extends NPC {
@@ -69,7 +76,11 @@ export class ProjectNPC extends NPC {
             );
             texture.vScale = -1;
             texture.updateSamplingMode(Texture.NEAREST_SAMPLINGMODE);
-            npc_fishGame.setTexture(texture);
+            npc_fishGame.setTexture(
+                texture,
+                new Color3(0, 0, 0),
+                settings.modelOutlineWidth,
+            );
 
             var displayTag = createDisplayTag(
                 npc_fishGame.data.npcName,
@@ -124,12 +135,14 @@ export class ProjectNPC extends NPC {
                                 meshesToToggleOnInspect.push(plane);
                                 root.position =
                                     npc_fishGame.meshes[0].position.add(
-                                        new Vector3(6, 6.5, -7),
+                                        settings.bentoOffset ||
+                                            new Vector3(6, 6.5, -7),
                                     );
                                 root.scaling = new Vector3(2.5, 1.5, 1.5);
 
                                 root.rotation = Vector3DegreesToRadians(
-                                    new Vector3(-5, 200, 0),
+                                    settings.bentoRotation ||
+                                        new Vector3(-5, 200, 0),
                                 );
 
                                 var advancedTexture =
@@ -226,7 +239,8 @@ export class ProjectNPC extends NPC {
                                 root.scaling = new Vector3(1, 1.1, 1).scale(2);
 
                                 root.rotation = Vector3DegreesToRadians(
-                                    new Vector3(0, 200, 0.5),
+                                    settings.textBlockRotation ||
+                                        new Vector3(0, 200, 0.5),
                                 );
 
                                 var advancedTexture =
@@ -237,7 +251,7 @@ export class ProjectNPC extends NPC {
                                 //background colour
                                 const rect = new GUI.Rectangle();
                                 rect.width = "100%";
-                                rect.height = "25%";
+                                rect.height = "30%";
                                 rect.background = "#171717";
                                 rect.alpha = 0.5;
                                 rect.cornerRadius = 6;
@@ -277,10 +291,12 @@ export class ProjectNPC extends NPC {
 
                                 root.position =
                                     npc_fishGame.meshes[0].position.add(
-                                        new Vector3(-2, 8, 0),
+                                        settings.thumbnailOffset ||
+                                            new Vector3(-2, 8, 0),
                                     );
                                 root.rotation = Vector3DegreesToRadians(
-                                    new Vector3(0, 240, -2),
+                                    settings.thumbnailRotation ||
+                                        new Vector3(0, 240, -2),
                                 );
                                 root.scaling = new Vector3(1, 1, 1).scale(1);
 

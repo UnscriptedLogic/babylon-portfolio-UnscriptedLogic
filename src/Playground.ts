@@ -614,7 +614,7 @@ var playgroundScene = function (
             modelRotation: new Vector3(0, 15, 0),
             player,
             camera,
-            cameraOffset: new Vector3(13, 3, 13),
+            cameraOffset: new Vector3(10, 3, 13),
             gameUrl: "https://unscriptedlogic.itch.io/vizion",
             gameDescription:
                 "To see is to have the information, to hear is to have the step ahead. To execute, now that's up to you. A game created for the Mix and Game Jam 2020.",
@@ -629,6 +629,191 @@ var playgroundScene = function (
                 { src: "/images/Vizion/Video1.mp4", colSpan: 5, rowSpan: 5 },
                 { src: "/images/Vizion/Image3.jpg", colSpan: 3, rowSpan: 3 },
                 { src: "/images/Vizion/Image4.jpg", colSpan: 2, rowSpan: 2 },
+            ],
+        },
+        scene,
+        shadows,
+    );
+    const npc_memoryLooper = new ProjectNPC(
+        {
+            npcName: "Memory Looper",
+            modelName: "MemoryLooper",
+            textureName: "/textures/MemoryLooper.png",
+            modelPosition: new Vector3(50, 0.5, -47),
+            modelRotation: new Vector3(0, 0, 0),
+            player,
+            camera,
+            cameraOffset: new Vector3(3, 3, 18),
+            cameraTargetOffset: new Vector3(4, 6, 0),
+            gameUrl: "https://unscriptedlogic.itch.io/memory-looper",
+            gameDescription:
+                "It seems like we've been here before. Shall we help each other out? A game created using Blender and Unity for the Mini Jam 2020.",
+            description:
+                "Memory Looper was a fun one. The core mechanic is simple. You hit a spark that starts recording your actions and memorizes them. Then replays them in real time. You can use this to solve puzzles that require multiple actions at once. The game is a bit rough around the edges but I'm proud of the core mechanic and how the levels turned out. Just ignore the scattered cringy notes I left around the levels. I was in a very different headspace back then.",
+            textBlockOffset: new Vector3(8, 1.75, -4),
+            textBlockRotation: new Vector3(0, 170, 0.5),
+            bentoOffset: new Vector3(8, 8.5, -4),
+            bentoRotation: new Vector3(-5, 170, 0),
+            thumbnailOffset: new Vector3(-3, 8, -3),
+            thumbnailRotation: new Vector3(0, 210, 0),
+            thumbnailImage: "/images/MemoryLooper/Thumbnail.png",
+            bentoImages: [
+                {
+                    src: "/images/MemoryLooper/Image1.png",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/MemoryLooper/Video2.mp4",
+                    colSpan: 3,
+                    rowSpan: 3,
+                },
+                {
+                    src: "/images/MemoryLooper/Image2.png",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/MemoryLooper/Image3.png",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/MemoryLooper/Image4.png",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/MemoryLooper/Video1.mp4",
+                    colSpan: 4,
+                    rowSpan: 4,
+                },
+            ],
+        },
+        scene,
+        shadows,
+    );
+    const npc_unnamedtd = new ProjectNPC(
+        {
+            npcName: "Unnamed TD",
+            modelName: "UnnamedTD",
+            modelOutlineWidth: 0.05,
+            textureName: "/textures/UnnamedTD.png",
+            modelPosition: new Vector3(-44, 0.5, -14),
+            modelRotation: new Vector3(0, 180, 0),
+            player,
+            camera,
+            thumbnailRotation: new Vector3(0, 230, 0),
+            bentoOffset: new Vector3(6, 7.5, -7),
+            cameraOffset: new Vector3(13, 3, 13),
+            gameUrl: "https://unscriptedlogic.itch.io/unnamed-tower-defence",
+            gameDescription:
+                "What if the maps on a tower defense game was procedurally generated? A game created using Blender and Unity",
+            description:
+                "I hold this project dear in my heart as one of my earliest best games. A simple tower defence game with procedurally generated maps and balance just the way I like it. It was originally made of a school project about utilizing Microsoft Azure but I loved making it so much that I kept on adding way more visually and mechanically. If there's any project I am proud of, it's this one.",
+            thumbnailImage: "/images/unnamedtd/Thumbnail.png",
+            bentoImages: [
+                { src: "/images/unnamedtd/Image1.png", colSpan: 2, rowSpan: 2 },
+                { src: "/images/unnamedtd/Video2.mp4", colSpan: 4, rowSpan: 4 },
+                { src: "/images/unnamedtd/Image2.png", colSpan: 2, rowSpan: 2 },
+                { src: "/images/unnamedtd/Image3.png", colSpan: 2, rowSpan: 2 },
+                { src: "/images/unnamedtd/Video1.mp4", colSpan: 3, rowSpan: 3 },
+                { src: "/images/unnamedtd/Image4.png", colSpan: 2, rowSpan: 2 },
+            ],
+        },
+        scene,
+        shadows,
+    );
+
+    const npc_momentumMayhem = new ProjectNPC(
+        {
+            npcName: "Momentum Mayhem",
+            modelName: "Momentum",
+            modelOutlineWidth: 0.025,
+            textureName: "/textures/Momentum.png",
+            modelPosition: new Vector3(-46, 0.5, 13),
+            modelRotation: new Vector3(0, 180, 0),
+            player,
+            camera,
+            thumbnailRotation: new Vector3(0, 230, 0),
+            bentoOffset: new Vector3(6, 6, -7),
+            cameraOffset: new Vector3(13, 3, 13),
+            gameUrl:
+                "https://store.steampowered.com/app/3051110/Momentum_Mayhem/?beta=0",
+            gameDescription:
+                "A casual 2.5D physics oriented game about building unorthodox contraptions to solve puzzles with a variety of items at disposal. Made with Blender and Unity.",
+            description:
+                "My take on the old game 'The Incredible Machine'. If there's one thing this project's taught me, it was game design. What the core juice of a game is and how to build around it. Up until before this project, I've always followed an instinct of what a game should have for it to be fun and while that is a good thing to have, it's also important to fundamentally identify in concrete terms what your game is and fill in the gaps with your instincts.",
+            thumbnailImage: "/images/Momentum/Thumbnail.jpg",
+            bentoImages: [
+                { src: "/images/Momentum/Video3.mp4", colSpan: 2, rowSpan: 2 },
+                { src: "/images/Momentum/Image2.jpg", colSpan: 2, rowSpan: 2 },
+                { src: "/images/Momentum/Image1.jpg", colSpan: 2, rowSpan: 2 },
+                { src: "/images/Momentum/Video4.mp4", colSpan: 2, rowSpan: 2 },
+                { src: "/images/Momentum/Video1.mp4", colSpan: 3, rowSpan: 3 },
+                { src: "/images/Momentum/Video2.mp4", colSpan: 4, rowSpan: 4 },
+            ],
+        },
+        scene,
+        shadows,
+    );
+
+    const npc_autoPetRacers = new ProjectNPC(
+        {
+            npcName: "Auto Pet Racers",
+            modelName: "AutoPetRacers",
+            modelOutlineWidth: 0.025,
+            textureName: "/textures/AutoPetRacers.png",
+            modelPosition: new Vector3(-54, 0.5, 0),
+            modelRotation: new Vector3(0, 170, 0),
+            player,
+            camera,
+            cameraOffset: new Vector3(20, 3, 5),
+            cameraTargetOffset: new Vector3(0, 6, -5),
+            gameUrl:
+                "https://store.steampowered.com/app/4135220/Auto_Pet_Racers/",
+            gameDescription:
+                "A 2.5D pet racing simulator where you train your pets to run fast and hit hard. Build their speed to outrun the pack or train their wisdom to proc abilities that debuff others..",
+            description:
+                "The surreal moment of watching a youtube video of people enjoying your own game cannot be explained. I learned how to use UE5 and their blueprint and GamePlay Tag systems. I learned to find pitfalls in my game design, to draft up decision trees and find out what they might want. I learned to balance with excel sheets. I learned a lot about what I like to put in my games and what I want to avoid. A burnout project turned passion and success.",
+            thumbnailImage: "/images/AutoPetRacers/Thumbnail.jpg",
+            thumbnailOffset: new Vector3(-2, 8.5, 4),
+            thumbnailRotation: new Vector3(0, 280, 0),
+            bentoOffset: new Vector3(4.5, 6, -7.5),
+            bentoRotation: new Vector3(0, 230, 0),
+            textBlockRotation: new Vector3(0, 230, 0),
+            textBlockOffset: new Vector3(4.5, 1.75, -7.5),
+            bentoImages: [
+                {
+                    src: "/images/AutoPetRacers/Video3.mp4",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/AutoPetRacers/Image2.jpg",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/AutoPetRacers/Image3.jpg",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/AutoPetRacers/Video2.mp4",
+                    colSpan: 4,
+                    rowSpan: 4,
+                },
+                {
+                    src: "/images/AutoPetRacers/Image4.jpg",
+                    colSpan: 2,
+                    rowSpan: 2,
+                },
+                {
+                    src: "/images/AutoPetRacers/Video1.mp4",
+                    colSpan: 3,
+                    rowSpan: 3,
+                },
             ],
         },
         scene,

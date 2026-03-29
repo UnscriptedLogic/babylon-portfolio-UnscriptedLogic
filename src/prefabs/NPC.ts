@@ -92,7 +92,11 @@ export class NPC implements Entity {
         this.loadMesh(this.scene, this.shadowGenerator, scale);
     }
 
-    setTexture(texture: Texture, outlineColor: Color3 = new Color3(0, 0, 0)) {
+    setTexture(
+        texture: Texture,
+        outlineColor: Color3 = new Color3(0, 0, 0),
+        outlineWidth?: number,
+    ) {
         for (const mesh of this.meshes) {
             if (mesh.getTotalVertices() <= 0) continue;
 
@@ -107,7 +111,7 @@ export class NPC implements Entity {
             mesh.material = material;
 
             mesh.renderOutline = true;
-            mesh.outlineWidth = 0.1;
+            mesh.outlineWidth = outlineWidth ?? 0.1;
             mesh.outlineColor = outlineColor;
         }
     }
