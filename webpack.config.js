@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const appDirectory = fs.realpathSync(process.cwd());
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     entry: path.resolve(appDirectory, "src/index.ts"), //path to the main .ts file
@@ -38,6 +39,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             inject: true,
             template: path.resolve(appDirectory, "public/index.html"),
+        }),
+        new CopyPlugin({
+            patterns: [{ from: "public", to: "" }],
         }),
     ],
     mode: "development",
