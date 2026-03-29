@@ -23,7 +23,7 @@ import { Fonts } from "../manager/fontmanager";
 
 export const ImportCustomModel = async (fileName: string, scene: Scene) => {
     const result = ImportMeshAsync(
-        `../public/models/Mesh_${fileName}.glb`,
+        `/public/models/Mesh_${fileName}.glb`,
         scene,
     );
     return result;
