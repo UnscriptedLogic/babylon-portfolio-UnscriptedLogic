@@ -28,6 +28,10 @@ module.exports = {
                 use: "ts-loader",
                 exclude: /node_modules/,
             },
+            {
+                test: /\.(glb|gltf)$/,
+                type: "asset/resource",
+            },
         ],
     },
     plugins: [
