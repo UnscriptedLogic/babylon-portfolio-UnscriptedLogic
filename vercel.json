@@ -1,6 +1,12 @@
 {
-    "routes": [
-        { "src": "/models/(.*)", "dest": "/models/$1" },
-        { "src": "/(.*)", "dest": "/index.html" }
+    "rewrites": [
+        {
+            "source": "/models/(.*)",
+            "destination": "/models/$1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/"
+        }
     ]
 }
