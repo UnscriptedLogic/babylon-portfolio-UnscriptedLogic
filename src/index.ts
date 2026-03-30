@@ -28,11 +28,22 @@ class App {
     canvas: HTMLCanvasElement;
     constructor() {
         // create the canvas html element and attach it to the webpage
+        const parent = document.createElement("canvas-parent");
+        //center the parent
+        parent.style.display = "flex";
+        parent.style.justifyContent = "center";
+        parent.style.alignItems = "center";
+        parent.style.width = "100vw";
+        parent.style.height = "100vh";
+        document.body.appendChild(parent);
+
         this.canvas = document.createElement("canvas");
+
+        //fill the entire screen but maintain centering
         this.canvas.style.width = "100%";
         this.canvas.style.height = "100%";
         this.canvas.id = "gameCanvas";
-        document.body.appendChild(this.canvas);
+        parent.appendChild(this.canvas);
 
         registerBuiltInLoaders();
 
