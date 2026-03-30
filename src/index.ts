@@ -37,7 +37,10 @@ class App {
         registerBuiltInLoaders();
 
         // initialize babylon scene and engine
-        var engine = new Engine(this.canvas, true);
+        var engine = new Engine(this.canvas, true, { antialias: false });
+
+        engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
+        engine.adaptToDeviceRatio = true;
 
         Promise.all([initializeHavok(), loadFonts()]).then(() => {});
         initializeHavok().then((havokPlugin) => {

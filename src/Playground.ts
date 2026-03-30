@@ -61,24 +61,24 @@ var playgroundScene = function (
     );
     camera.setTarget(Vector3.Zero());
 
-    var depthOffield = new LensRenderingPipeline(
-        "lens",
-        {
-            edge_blur: 1,
-            chromatic_aberration: 1,
-            distortion: 1,
-            dof_focus_distance: 40,
-            dof_aperture: 2.0, // set this very high for tilt-shift effect
-            // grain_amount: 1.0,
-            dof_pentagon: true,
-            dof_gain: 1.0,
-            dof_threshold: 1.0,
-            dof_darken: 0.25,
-        },
-        scene,
-        1,
-        [camera],
-    );
+    // var depthOffield = new LensRenderingPipeline(
+    //     "lens",
+    //     {
+    //         edge_blur: 1,
+    //         chromatic_aberration: 1,
+    //         distortion: 1,
+    //         dof_focus_distance: 40,
+    //         dof_aperture: 2.0, // set this very high for tilt-shift effect
+    //         // grain_amount: 1.0,
+    //         dof_pentagon: true,
+    //         dof_gain: 1.0,
+    //         dof_threshold: 1.0,
+    //         dof_darken: 0.25,
+    //     },
+    //     scene,
+    //     1,
+    //     [camera],
+    // );
 
     // Gentle purple/orange lighting + soft shadows
     const fill = new HemisphericLight("fill", new Vector3(0, 1, 0), scene);
