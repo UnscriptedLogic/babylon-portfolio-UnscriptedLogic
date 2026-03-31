@@ -48,15 +48,27 @@ export type ProjectNPCSettings = NPCSettings & {
     onTriggerExit?: () => void;
 };
 
+export type optimizeSettings = {
+    freezeMaterials?: boolean;
+    freezeWorldMatrix?: boolean;
+};
+
 export class ProjectNPC extends NPC {
     displayTag: Mesh;
+    optimizeOptions: optimizeSettings;
 
     constructor(
         settings: ProjectNPCSettings,
         scene: Scene,
         shadowGenerator: ShadowGenerator,
+        options?: optimizeSettings,
     ) {
         super(settings, scene, shadowGenerator);
+
+        this.optimizeOptions = options || {
+            freezeMaterials: true,
+            freezeWorldMatrix: true,
+        };
 
         ImportCustomModel(
             settings.modelName || "StupidFuckingFish",
@@ -470,6 +482,8 @@ export class ProjectNPC extends NPC {
                     },
                 },
             );
+
+            this.optimize();
         });
     }
 
@@ -481,6 +495,20 @@ export class ProjectNPC extends NPC {
 
         if (this.displayTag) {
             this.displayTag.isVisible = isVisible;
+        }
+    }
+
+    optimize() {
+        for (const mesh of this.meshes) {
+            if (mesh.getTotalVertices() <= 0) continue;
+
+            if (this.optimizeOptions.freezeMaterials && mesh.material) {
+                mesh.material.freeze();
+            }
+
+            if (this.optimizeOptions.freezeWorldMatrix) {
+                mesh.freezeWorldMatrix();
+            }
         }
     }
 }

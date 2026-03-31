@@ -372,6 +372,9 @@ var playgroundScene = function (
         },
         scene,
         shadows,
+        {
+            freezeWorldMatrix: false,
+        },
     );
 
     const npc_momentumMayhem = new ProjectNPC(
@@ -527,6 +530,11 @@ var playgroundScene = function (
             });
         },
     );
+
+    //optimzations
+    scene.autoClear = false; // Color buffer
+    scene.autoClearDepthAndStencil = false; // Depth and stencil, obviously
+    scene.blockMaterialDirtyMechanism = true;
 
     scene.onBeforeRenderObservable.add(() => {
         player.update();
