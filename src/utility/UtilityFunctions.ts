@@ -200,12 +200,18 @@ export const EachLetterPhysics = (
     position: Vector3,
     rotation: Vector3,
     earcut: any,
+    positionOffset?: Vector3,
     config?: EachLetterPhysicsConfig,
 ) => {
     const letters = text.split("");
     const letterMeshes: AbstractMesh[] = [];
 
     letters.forEach((letter, index) => {
+        //skip spaces
+        if (letter === " ") {
+            return;
+        }
+
         const letterMesh = MeshBuilder.CreateText(
             `letter_${letter}_${index}`,
             letter,
@@ -214,13 +220,24 @@ export const EachLetterPhysics = (
             scene,
             earcut,
         );
-        letterMesh.position = position.add(
-            new Vector3(
-                index * ((config?.size ?? 0.5) + (config?.spacing ?? 0)) * 1.2,
-                0,
-                0,
-            ),
-        );
+        letterMesh.position = position
+            .add(
+                new Vector3(
+                    index *
+                        ((config?.size ?? 0.5) + (config?.spacing ?? 0)) *
+                        1.2,
+                    0,
+                    0,
+                ),
+            )
+
+            //add offset relative to the index of the letter
+            .add(
+                positionOffset
+                    ? positionOffset.multiplyByFloats(index, index, index)
+                    : Vector3.Zero(),
+            );
+
         letterMesh.rotation = Vector3DegreesToRadians(rotation);
         letterMeshes.push(letterMesh);
 

@@ -338,52 +338,35 @@ export function buildPlaygroundMap(
             }
         });
 
-        const title = create3DText(
-            "Prototypes_title",
-            data.prototype_projects.display_name,
-            new Vector3(45, 3, 37),
-            new Vector3(0, 30, 180),
-            Fonts.MUSTICA,
-        );
-
-        title.renderOutline = true;
-        title.outlineWidth = 0.05;
-        title.outlineColor = new Color3(0, 0, 0);
-
-        title.material = new StandardMaterial("titleMat", scene);
-        (title.material as StandardMaterial).diffuseColor =
-            Color3.FromHexString("#ffffff").scale(1);
-        title.material.backFaceCulling = true;
-
-        new PhysicsAggregate(
-            title,
-            PhysicsShapeType.BOX,
-            { mass: 20, restitution: 0.1, friction: 0.9 },
+        EachLetterPhysics(
+            "Click or Tap to move around",
             scene,
-        );
+            new Vector3(45, 1, 15),
+            new Vector3(0, 225, 0),
+            earcut,
+            new Vector3(1.05, 0, 1.05),
+            {
+                size: 2,
+                depth: 0.5,
+                spacing: -3.75,
+                forEach(letter, index, mesh) {
+                    mesh.renderOutline = true;
+                    mesh.outlineWidth = 0.05;
+                    mesh.outlineColor = new Color3(0, 0, 0);
 
-        const subtitle = create3DText(
-            "Prototypes_title",
-            "Forge Of",
-            new Vector3(42, 3, 35),
-            new Vector3(0, 30, 180),
-            Fonts.MUSTICA,
-        );
+                    mesh.material = new StandardMaterial("titleMat", scene);
+                    (mesh.material as StandardMaterial).diffuseColor =
+                        Color3.FromHexString("#ffffff").scale(1);
+                    mesh.material.backFaceCulling = true;
 
-        subtitle.renderOutline = true;
-        subtitle.outlineWidth = 0.05;
-        subtitle.outlineColor = new Color3(0, 0, 0);
-
-        subtitle.material = new StandardMaterial("titleMat", scene);
-        (subtitle.material as StandardMaterial).diffuseColor =
-            Color3.FromHexString("#ffffff").scale(1);
-        subtitle.material.backFaceCulling = true;
-
-        new PhysicsAggregate(
-            subtitle,
-            PhysicsShapeType.BOX,
-            { mass: 20, restitution: 0.1, friction: 0.9 },
-            scene,
+                    new PhysicsAggregate(
+                        mesh,
+                        PhysicsShapeType.BOX,
+                        { mass: 5, restitution: 0.1, friction: 0.9 },
+                        scene,
+                    );
+                },
+            },
         );
     };
 
@@ -392,22 +375,13 @@ export function buildPlaygroundMap(
         const { display_name } = data;
         const [firstName, lastName] = display_name.split(" ");
 
-        // const first_name = create3DText(
-        //     firstName,
-        //     firstName,
-        //     new Vector3(15, 1, -15),
-        //     new Vector3(0, -180, 0),
-        //     Fonts.MUSTICA,
-        //     4,
-        //     0.5,
-        // );
-
         const first_name = EachLetterPhysics(
             firstName,
             scene,
-            new Vector3(23, 1, -15),
+            new Vector3(35, 1, -15),
             new Vector3(0, -180, 0),
             earcut,
+            new Vector3(0, 0, 0),
             {
                 size: 4,
                 depth: 1,
@@ -430,39 +404,46 @@ export function buildPlaygroundMap(
             },
         );
 
-        // const last_name = create3DText(
-        //     lastName,
-        //     lastName,
-        //     new Vector3(-7, 1, -15),
-        //     new Vector3(0, -180, 0),
-        //     Fonts.MUSTICA,
-        //     4,
-        //     0.5,
-        // );
-
-        // last_name.renderOutline = true;
-        // last_name.outlineWidth = 0.05;
-        // last_name.outlineColor = new Color3(0, 0, 0);
-
-        // shadows.addShadowCaster(last_name, true);
-
-        // new PhysicsAggregate(
-        //     last_name,
-        //     PhysicsShapeType.BOX,
-        //     { mass: 20, restitution: 0.4, friction: 0.9 },
-        //     scene,
-        // );
-
         const last_name = EachLetterPhysics(
             lastName,
             scene,
-            new Vector3(-7, 1, -15),
+            new Vector3(5, 1, -15),
             new Vector3(0, -180, 0),
             earcut,
+            new Vector3(0, 0, 0),
             {
                 size: 4,
                 depth: 1,
                 spacing: -6.25,
+                font: Fonts.MUSTICA,
+                forEach: (letter, index, mesh) => {
+                    mesh.renderOutline = true;
+                    mesh.outlineWidth = 0.05;
+                    mesh.outlineColor = new Color3(0, 0, 0);
+
+                    shadows.addShadowCaster(mesh, true);
+
+                    new PhysicsAggregate(
+                        mesh,
+                        PhysicsShapeType.BOX,
+                        { mass: 10, restitution: 0.4, friction: 0.9 },
+                        scene,
+                    );
+                },
+            },
+        );
+
+        const profession = EachLetterPhysics(
+            data.profession,
+            scene,
+            new Vector3(-15, 1, 10),
+            new Vector3(0, -90, 0),
+            earcut,
+            new Vector3(3, 0, 3),
+            {
+                size: 3,
+                depth: 1,
+                spacing: -5.5,
                 font: Fonts.MUSTICA,
                 forEach: (letter, index, mesh) => {
                     mesh.renderOutline = true;
@@ -522,11 +503,21 @@ export function buildPlaygroundMap(
 
     createPrototypes();
 
-    // Dynamic cubes to knock around
-    createDynamicCube("cube_1", 2, new Vector3(0, 1, 12), 3);
-    createDynamicCube("cube_2", 2, new Vector3(4, 1, 14), 3);
-    createDynamicCube("cube_3", 1.5, new Vector3(-6, 1, 10), 2);
-    createDynamicCube("cube_4", 1.5, new Vector3(-8, 1, -2), 2);
+    //scatter some random cubes for fun
+    const anchorPoint = new Vector3(0, 10, 20);
+    for (let i = 0; i < 10; i++) {
+        const randomOffset = new Vector3(
+            (Math.random() - 0.5) * 10,
+            0,
+            (Math.random() - 0.5) * 10,
+        );
+        createDynamicCube(
+            `cube_${i}`,
+            Math.random() * 2 + 1,
+            anchorPoint.add(randomOffset),
+            1 + Math.random() * 4,
+        );
+    }
 
     return meshes;
 }

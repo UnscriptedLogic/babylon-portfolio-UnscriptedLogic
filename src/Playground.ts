@@ -14,6 +14,7 @@ import {
     LensRenderingPipeline,
     Mesh,
     MeshBuilder,
+    NoiseProceduralTexture,
     PhysicsAggregate,
     PhysicsShapeType,
     Scene,
@@ -43,6 +44,7 @@ import {
 import { createBentoLayout } from "./utility/BentoBoxLayout";
 import { ProjectNPC } from "./prefabs/NPCs/ProjectNPC";
 import { attachBobbing } from "./utility/Bobbing";
+import { spawnImpactShockwave } from "./utility/Shockwave";
 
 var playgroundScene = function (
     engine: Engine,
@@ -65,8 +67,6 @@ var playgroundScene = function (
     //     "lens",
     //     {
     //         edge_blur: 1,
-    //         chromatic_aberration: 1,
-    //         distortion: 1,
     //         dof_focus_distance: 40,
     //         dof_aperture: 2.0, // set this very high for tilt-shift effect
     //         // grain_amount: 1.0,
@@ -115,7 +115,7 @@ var playgroundScene = function (
     scene.enablePhysics(new Vector3(0, -25, 0), hk);
 
     // Spawn point for the player (tunable)
-    const spawnPoint = new Vector3(0, 5, 0);
+    const spawnPoint = new Vector3(45, 5, 40);
 
     // Ground (static)
     const ground = MeshBuilder.CreateGround(
@@ -524,12 +524,117 @@ var playgroundScene = function (
                 speed: 0.5,
             });
 
-            //perpetual spinning rotation
             scene.onBeforeRenderObservable.add(() => {
                 maxwell.rotation.y += 0.015;
             });
         },
     );
+
+    const stoneCount = 30;
+    const noiseTexture = new NoiseProceduralTexture("perlin", 256, scene);
+    noiseTexture.animationSpeedFactor = 5; // Animate the noise
+    noiseTexture.persistence = 2;
+    noiseTexture.brightness = 0.5;
+    noiseTexture.octaves = 2;
+
+    let executed: boolean = false;
+
+    noiseTexture.onGeneratedObservable.add(() => {
+        //read each pixel's grayscale value and use it to determine whether to spawn a stone there or not, with a certain threshold
+
+        if (executed) return; // Only execute once after the noise is generated
+
+        executed = true;
+
+        const threshold = 0.5; // Tune this to control stone density
+        const width = noiseTexture.getSize().width;
+        const data = noiseTexture.readPixels().then((data) => {
+            const validPositions: Vector3[] = [];
+
+            for (let i = 0; i < data.byteLength; i += 4) {
+                const r = data[i] / 255;
+                const g = data[i + 1] / 255;
+                const b = data[i + 2] / 255;
+                const a = data[i + 3] / 255;
+
+                // Convert RGBA to grayscale
+                const grayscale = (r + g + b) / 3;
+
+                if (grayscale > threshold) {
+                    const index = i / 4;
+                    const x = (index % width) - width / 2;
+                    const z = Math.floor(index / width) - width / 2;
+                    validPositions.push(new Vector3(x, 0, z));
+                }
+            }
+
+            // Randomly select positions from validPositions to spawn stones
+            for (let i = 0; i < stoneCount; i++) {
+                if (validPositions.length === 0) break;
+                const posIndex = Math.floor(
+                    Math.random() * validPositions.length,
+                );
+                const position = validPositions.splice(posIndex, 1)[0];
+
+                //redo position if its too far from a given threshold
+                const distanceFromCenter = Math.sqrt(
+                    position.x * position.x + position.z * position.z,
+                );
+                const maxDistance = 80;
+                if (distanceFromCenter > maxDistance) {
+                    i--;
+                    continue;
+                }
+
+                ImportCustomModel("Stone1", scene).then(
+                    (result: ISceneLoaderAsyncResult) => {
+                        const stone = result.meshes[0] as Mesh;
+
+                        stone.position = position;
+
+                        stone.rotation = Vector3DegreesToRadians(
+                            new Vector3(
+                                0,
+                                Math.floor(Math.random() * 4) * 90,
+                                0,
+                            ),
+                        );
+
+                        stone.scaling = new Vector3(1, 1, 1).scale(
+                            0.5 + Math.random() * 0.5,
+                        );
+
+                        const material = new StandardMaterial(
+                            "stoneMat",
+                            scene,
+                        );
+                        material.diffuseColor = Color3.FromHexString("#96c09c");
+
+                        for (const mesh of result.meshes) {
+                            mesh.material = material;
+                        }
+
+                        shadows.addShadowCaster(stone);
+                    },
+                );
+            }
+        });
+    });
+
+    //spawn a particle on the floor whenever the player clicks, with a normal perpendicular to the floor and a random rotation, that quickly disappears
+    scene.onPointerDown = (evt, pickResult) => {
+        if (pickResult.hit) {
+            spawnImpactShockwave(
+                scene,
+                pickResult.pickedPoint,
+                pickResult.getNormal(true),
+                {
+                    strength: 0.1,
+                    durationSeconds: 1.5,
+                },
+            );
+        }
+    };
 
     //optimzations
     scene.autoClear = false; // Color buffer
