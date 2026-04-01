@@ -497,18 +497,6 @@ export function buildPlaygroundMap(
     };
 
     const createBasketballCourt = () => {
-        const plane = MeshBuilder.CreateGround(
-            "court",
-            { width: 25, height: 28 },
-            scene,
-        );
-        plane.position = new Vector3(-50, 0.5, 57);
-        plane.rotation = Vector3DegreesToRadians(new Vector3(0, 0, 0));
-
-        plane.material = new StandardMaterial("planeMat", scene);
-        (plane.material as StandardMaterial).diffuseColor =
-            Color3.FromHexString("#d2ab7a");
-
         const material = new StandardMaterial("courtMat", scene);
 
         //hollowgram blue with some emissive glow
@@ -517,7 +505,7 @@ export function buildPlaygroundMap(
 
         ImportCustomModel("BasketballCourt", scene).then((result) => {
             const model = result.meshes[0];
-            model.position = new Vector3(-50, 1, 57);
+            model.position = new Vector3(-50, 1.5, 57);
             model.rotation = Vector3DegreesToRadians(new Vector3(0, 180, 0));
 
             for (const m of result.meshes) {
@@ -620,14 +608,18 @@ export function buildPlaygroundMap(
             );
         });
 
-        ImportCustomModel("Ramp", scene).then((result) => {
+        ImportCustomModel("RoundRamp", scene).then((result) => {
             const model = result.meshes[0];
-            model.position = new Vector3(-35, 0, 57);
+            model.position = new Vector3(-50, 0, 57);
             model.rotation = Vector3DegreesToRadians(new Vector3(0, 180, 0));
+
+            const rampMat = new StandardMaterial("planeMat", scene);
+            (rampMat as StandardMaterial).diffuseColor =
+                Color3.FromHexString("#d2ab7a");
 
             for (const m of result.meshes) {
                 if (m.getTotalVertices() <= 0) continue; // skip invisible/empty meshes that would cause physics issues
-                m.material = material;
+                m.material = rampMat;
 
                 new PhysicsAggregate(
                     m,
