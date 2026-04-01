@@ -16,6 +16,9 @@ import {
     BaseTexture,
     Texture,
     Material,
+    ActionManager,
+    ExecuteCodeAction,
+    ParticleSystem,
 } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
 import { Fonts as Fonts } from "../manager/fontmanager";
@@ -493,6 +496,149 @@ export function buildPlaygroundMap(
         // }, 1000);
     };
 
+    const createBasketballCourt = () => {
+        const plane = MeshBuilder.CreateGround(
+            "court",
+            { width: 25, height: 28 },
+            scene,
+        );
+        plane.position = new Vector3(-50, 0.5, 57);
+        plane.rotation = Vector3DegreesToRadians(new Vector3(0, 0, 0));
+
+        plane.material = new StandardMaterial("planeMat", scene);
+        (plane.material as StandardMaterial).diffuseColor =
+            Color3.FromHexString("#d2ab7a");
+
+        const material = new StandardMaterial("courtMat", scene);
+
+        //hollowgram blue with some emissive glow
+        material.diffuseColor = Color3.FromHexString("#ffffff");
+        material.specularColor = Color3.FromHexString("#000000");
+
+        ImportCustomModel("BasketballCourt", scene).then((result) => {
+            const model = result.meshes[0];
+            model.position = new Vector3(-50, 1, 57);
+            model.rotation = Vector3DegreesToRadians(new Vector3(0, 180, 0));
+
+            for (const m of result.meshes) {
+                if (m.getTotalVertices() <= 0) continue; // skip invisible/empty meshes that would cause physics issues
+                m.material = material;
+
+                attachBobbing(m, {
+                    enabled: true,
+                    amplitude: Math.random() * 0.2 + 0.25,
+                    speed: Math.random() * 0.2 + 0.1,
+                });
+
+                shadows.addShadowCaster(m, true);
+            }
+        });
+
+        ImportCustomModel("BasketballRing", scene).then((result) => {
+            const model = result.meshes[0];
+            model.position = new Vector3(-60, 5, 57);
+            model.rotation = Vector3DegreesToRadians(new Vector3(0, 180, 0));
+
+            for (const m of result.meshes) {
+                if (m.getTotalVertices() <= 0) continue; // skip invisible/empty meshes that would cause physics issues
+
+                m.material = material;
+                shadows.addShadowCaster(m, true);
+
+                new PhysicsAggregate(
+                    m,
+                    PhysicsShapeType.MESH,
+                    { mass: 0, restitution: 0.5, friction: 0.9 },
+                    scene,
+                );
+
+                m.isPickable = false;
+            }
+
+            //add a trigger box below the ring to detect when the ball goes through
+            const triggerBox = MeshBuilder.CreateBox(
+                "hoop_trigger",
+                { width: 1, height: 0.5, depth: 1 },
+                scene,
+            );
+            triggerBox.position = model.position.add(new Vector3(2, 0.5, 0));
+            triggerBox.isVisible = false;
+
+            //add particle effect for when the ball goes through the hoop
+            const particleSystem = new ParticleSystem(
+                "hoop_particles",
+                2000,
+                scene,
+            );
+            particleSystem.particleTexture = new Texture(
+                "textures/star.png",
+                scene,
+            );
+            particleSystem.emitter = triggerBox;
+            particleSystem.minEmitBox = new Vector3(-0.5, 0, -0.5);
+            particleSystem.maxEmitBox = new Vector3(0.5, 0, 0.5);
+            particleSystem.color1 = Color4.FromHexString("#ffffff");
+            particleSystem.color2 = Color4.FromHexString("#ffffff");
+            particleSystem.minSize = 0.1;
+            particleSystem.maxSize = 0.5;
+            particleSystem.minLifeTime = 0.5;
+            particleSystem.maxLifeTime = 1;
+            particleSystem.emitRate = 1000;
+            particleSystem.blendMode = ParticleSystem.BLENDMODE_ONEONE;
+            particleSystem.gravity = new Vector3(0, -25, 0);
+            particleSystem.direction1 = new Vector3(-1, 1, -1);
+            particleSystem.direction2 = new Vector3(1, 1, 1);
+            particleSystem.minAngularSpeed = 0;
+            particleSystem.maxAngularSpeed = Math.PI;
+            particleSystem.minEmitPower = 5;
+            particleSystem.maxEmitPower = 30;
+            particleSystem.updateSpeed = 0.01;
+
+            //fire the particle system once only
+            triggerBox.actionManager = new ActionManager(scene);
+            triggerBox.actionManager.registerAction(
+                new ExecuteCodeAction(
+                    {
+                        trigger: ActionManager.OnIntersectionEnterTrigger,
+                        parameter: { mesh: player },
+                    },
+                    () => {
+                        particleSystem.start();
+                    },
+                ),
+            );
+            triggerBox.actionManager.registerAction(
+                new ExecuteCodeAction(
+                    {
+                        trigger: ActionManager.OnIntersectionExitTrigger,
+                        parameter: { mesh: player },
+                    },
+                    () => {
+                        particleSystem.stop();
+                    },
+                ),
+            );
+        });
+
+        ImportCustomModel("Ramp", scene).then((result) => {
+            const model = result.meshes[0];
+            model.position = new Vector3(-35, 0, 57);
+            model.rotation = Vector3DegreesToRadians(new Vector3(0, 180, 0));
+
+            for (const m of result.meshes) {
+                if (m.getTotalVertices() <= 0) continue; // skip invisible/empty meshes that would cause physics issues
+                m.material = material;
+
+                new PhysicsAggregate(
+                    m,
+                    PhysicsShapeType.MESH,
+                    { mass: 0, restitution: 0.5, friction: 0.9 },
+                    scene,
+                );
+            }
+        });
+    };
+
     createHub();
 
     createSpawnArea();
@@ -502,6 +648,8 @@ export function buildPlaygroundMap(
     createSideProjects();
 
     createPrototypes();
+
+    createBasketballCourt();
 
     //scatter some random cubes for fun
     const anchorPoint = new Vector3(0, 10, 20);
