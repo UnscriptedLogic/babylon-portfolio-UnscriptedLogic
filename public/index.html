@@ -9,13 +9,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <title>UnscriptedLogic</title>
-
-        //redirect to rickroll video because today is april fools
         <script>
-            window.onload = function () {
-                window.location.href =
-                    "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-            };
+            //if the date is april 1st, redirect to rickroll
+            const today = new Date();
+            if (today.getMonth() === 3 && today.getDate() === 1) {
+                window.onload = function () {
+                    window.location.href =
+                        "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+                };
+            }
         </script>
     </head>
     <body></body>
