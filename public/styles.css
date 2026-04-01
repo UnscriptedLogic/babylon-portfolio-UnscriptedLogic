@@ -6,10 +6,30 @@
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     touch-action: manipulation;
 }
 
 body {
     background-color: black;
+    display: flex;
+    flex-direction: column;
+    margin-top: 80px;
+}
+
+/* Styles specifically for landscape orientation */
+@media screen and (orientation: portrait) {
+    /* CSS rules for portrait mode go here */
+    body {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* Styles specifically for landscape orientation */
+@media screen and (orientation: landscape) {
+    /* CSS rules for portrait mode go here */
+    body {
+        width: 100vw;
+        height: 100vh;
+    }
 }

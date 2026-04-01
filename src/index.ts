@@ -28,30 +28,28 @@ class App {
     canvas: HTMLCanvasElement;
     constructor() {
         // create the canvas html element and attach it to the webpage
-        const parent = document.createElement("canvas-parent");
-        //center the parent
-        parent.style.display = "flex";
-        parent.style.justifyContent = "center";
-        parent.style.alignItems = "center";
-        parent.style.width = "100vw";
-        parent.style.height = "100vh";
-        document.body.appendChild(parent);
+        // const parent = document.createElement("canvas-parent");
+        // //center the parent
+        // parent.style.display = "flex";
+        // parent.style.justifyContent = "center";
+        // parent.style.alignItems = "center";
+        // parent.style.width = "100vw";
+        // parent.style.height = "100vh";
+        // document.body.appendChild(parent);
 
         this.canvas = document.createElement("canvas");
+        this.canvas.style.width = `100%`;
+        this.canvas.style.height = `100%`;
 
-        //fill the entire screen but maintain centering
-        this.canvas.style.width = "100%";
-        this.canvas.style.height = "100%";
-        this.canvas.id = "gameCanvas";
-        parent.appendChild(this.canvas);
+        document.body.appendChild(this.canvas);
 
         registerBuiltInLoaders();
 
         // initialize babylon scene and engine
         var engine = new Engine(this.canvas, true, { antialias: false }, true);
 
-        // engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
-        // engine.adaptToDeviceRatio = true;
+        engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
+        engine.adaptToDeviceRatio = true;
 
         Promise.all([initializeHavok(), loadFonts()]).then(() => {});
         initializeHavok().then((havokPlugin) => {
@@ -67,6 +65,31 @@ class App {
                     }
                 }
             });
+
+            window.addEventListener("load", function () {
+                setTimeout(function () {
+                    // This hides the address bar on mobile
+                    window.scrollTo(0, 1);
+                }, 0);
+            });
+
+            const orientationMediaQuery: MediaQueryList = window.matchMedia(
+                "(orientation: portrait)",
+            );
+            orientationMediaQuery.addEventListener(
+                "change",
+                (e: MediaQueryListEvent) => {
+                    if (e.matches) {
+                        console.log("Orientation changed to portrait");
+                    } else {
+                        console.log("Orientation changed to landscape");
+                        setTimeout(function () {
+                            // This hides the address bar on mobile
+                            window.scrollTo(0, 99);
+                        }, 0);
+                    }
+                },
+            );
 
             // run the main render loop
             engine.runRenderLoop(() => {
